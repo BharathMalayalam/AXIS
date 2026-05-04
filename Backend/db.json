@@ -1,0 +1,17 @@
+{
+  "users": [
+    {
+      "id": "u1",
+      "name": "Super Admin",
+      "email": "admin@jira.com",
+      "phone": "9999999999",
+      "userId": "ADMIN001",
+      "password": "admin123",
+      "role": "admin"
+    }
+  ],
+  "projects": [],
+  "modules": [],
+  "queries": [],
+  "notifications": []
+}

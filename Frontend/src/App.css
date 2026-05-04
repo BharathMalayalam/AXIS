@@ -1,0 +1,9 @@
+/* App.css – AXIS Project Management Platform */
+/* All global design tokens & component styles live in index.css */
+/* This file is reserved for any Vite-generated or app-level overrides */
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
