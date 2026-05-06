@@ -1,4 +1,5 @@
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
 const path = require('path');
@@ -25,4 +26,14 @@ const upload = multer({
     }),
 });
 
-module.exports = { upload, s3 };
+const getDownloadUrl = async (key) => {
+    if (!key) return null;
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+    });
+    // Link expires in 1 hour (3600 seconds)
+    return await getSignedUrl(s3, command, { expiresIn: 3600 });
+};
+
+module.exports = { upload, s3, getDownloadUrl };

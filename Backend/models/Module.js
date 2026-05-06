@@ -21,6 +21,7 @@ const moduleSchema = new mongoose.Schema({
     },
     submittedAt: { type: Date, default: null },
     fileUrl: { type: String, default: null },
+    fileKey: { type: String, default: null },
     fileName: { type: String, default: null },
     completedAt: { type: Date, default: null },
 }, { timestamps: true });

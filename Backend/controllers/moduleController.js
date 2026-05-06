@@ -1,6 +1,7 @@
 const Module = require('../models/Module');
 const Project = require('../models/Project');
 const Issue = require('../models/Issue');
+const { getDownloadUrl } = require('../utils/s3Config');
 
 // @desc    Create module (TL assigns to dev)
 // @route   POST /api/modules
@@ -43,10 +44,19 @@ const getModules = async (req, res) => {
             filter = { projectId: { $in: tlProjects } };
         }
 
-        const modules = await Module.find(filter)
+        const modulesRaw = await Module.find(filter)
             .populate('assignedDev', 'name userId email')
             .populate('projectId', 'name deadline')
             .sort('-createdAt');
+
+        // Generate signed URLs for all modules with files
+        const modules = await Promise.all(modulesRaw.map(async (m) => {
+            const moduleObj = m.toObject();
+            if (moduleObj.fileKey) {
+                moduleObj.fileUrl = await getDownloadUrl(moduleObj.fileKey);
+            }
+            return moduleObj;
+        }));
 
         res.json({ success: true, count: modules.length, modules });
     } catch (err) {
@@ -59,8 +69,17 @@ const getModules = async (req, res) => {
 // @access  Admin, TL
 const getModulesByProject = async (req, res) => {
     try {
-        const modules = await Module.find({ projectId: req.params.projectId })
+        const modulesRaw = await Module.find({ projectId: req.params.projectId })
             .populate('assignedDev', 'name userId');
+        
+        const modules = await Promise.all(modulesRaw.map(async (m) => {
+            const moduleObj = m.toObject();
+            if (moduleObj.fileKey) {
+                moduleObj.fileUrl = await getDownloadUrl(moduleObj.fileKey);
+            }
+            return moduleObj;
+        }));
+
         res.json({ success: true, modules });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -76,7 +95,13 @@ const updateModule = async (req, res) => {
             .populate('assignedDev', 'name userId')
             .populate('projectId', 'name');
         if (!module) return res.status(404).json({ success: false, error: 'Module not found.' });
-        res.json({ success: true, module });
+
+        const moduleObj = module.toObject();
+        if (moduleObj.fileKey) {
+            moduleObj.fileUrl = await getDownloadUrl(moduleObj.fileKey);
+        }
+
+        res.json({ success: true, module: moduleObj });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -98,11 +123,18 @@ const submitModule = async (req, res) => {
         
         if (req.file) {
             module.fileUrl = req.file.location;
+            module.fileKey = req.file.key;
             module.fileName = req.file.originalname;
         }
 
         await module.save();
-        res.json({ success: true, module });
+
+        const moduleObj = module.toObject();
+        if (moduleObj.fileKey) {
+            moduleObj.fileUrl = await getDownloadUrl(moduleObj.fileKey);
+        }
+
+        res.json({ success: true, module: moduleObj });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
