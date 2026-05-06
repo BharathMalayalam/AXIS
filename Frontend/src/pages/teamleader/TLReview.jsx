@@ -106,7 +106,7 @@ const TLReview = () => {
                     <td style={{ paddingRight: '1.5rem' }}>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
                         {mod.fileUrl && (
-                          <a href={`http://localhost:5000${mod.fileUrl}`} target="_blank" rel="noopener noreferrer" 
+                          <a href={mod.fileUrl.startsWith('http') ? mod.fileUrl : `http://localhost:5000${mod.fileUrl}`} target="_blank" rel="noopener noreferrer" 
                             style={{ background: '#EAE6FF', border: '1px solid #C0B6F2', color: '#403294', borderRadius: '5px', padding: '0.4rem 0.875rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: '700', textDecoration: 'none', transition: 'all 0.15s' }}
                             className="view-btn">
                             <Download size={14} /> File

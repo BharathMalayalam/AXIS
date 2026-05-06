@@ -97,7 +97,7 @@ const submitModule = async (req, res) => {
         module.submittedAt = new Date();
         
         if (req.file) {
-            module.fileUrl = `/uploads/modules/${req.file.filename}`;
+            module.fileUrl = req.file.location;
             module.fileName = req.file.originalname;
         }
 
