@@ -1,0 +1,17 @@
+{
+  "name": "axis-root",
+  "version": "1.0.0",
+  "description": "Root for Jira Clone (AXIS)",
+  "scripts": {
+    "install-all": "npm install --prefix Backend && npm install --prefix Frontend",
+    "backend": "npm run dev --prefix Backend",
+    "frontend": "npm run dev --prefix Frontend",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "seed": "node Backend/seed.js",
+    "docker-up": "docker compose up --build",
+    "docker-down": "docker compose down"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

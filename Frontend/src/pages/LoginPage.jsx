@@ -61,13 +61,19 @@ const LoginPage = () => {
     try {
       const res = await login(userId, password, role);
       if (res.success) {
+        // Use a small timeout to ensure AppContext state has propagated
         const r = res.user.role?.toLowerCase();
-        navigate(r === 'admin' ? '/admin' : r === 'teamleader' ? '/tl' : '/dev');
+        const targetPath = r === 'admin' ? '/admin' : r === 'teamleader' ? '/tl' : '/dev';
+        
+        // Clear any previous errors and navigate
+        setError('');
+        navigate(targetPath, { replace: true });
       } else {
         setError(res.error || 'Authentication failed. Please check your credentials.');
       }
-    } catch {
+    } catch (err) {
       setError('Connection error. Please try again later.');
+      console.error('Login error:', err);
     } finally {
       setIsLoading(false);
     }

@@ -61,12 +61,15 @@ export function AppProvider({ children }) {
   // --- Auth ---
   const login = async (userId, password, role) => {
     try {
+      console.log('Attempting login for:', { userId, role });
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, password, role })
       });
       const data = await res.json();
+      console.log('Login response:', data);
+
       if (data.success) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('currentUser', JSON.stringify(data.user));
@@ -75,7 +78,8 @@ export function AppProvider({ children }) {
         return { success: true, user: data.user };
       }
       return { success: false, error: data.error };
-    } catch {
+    } catch (err) {
+      console.error('Login fetch error:', err);
       return { success: false, error: 'Cannot connect to server. Is the backend running?' };
     }
   };
