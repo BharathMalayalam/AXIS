@@ -6,6 +6,8 @@ services:
       - "5000:5000"
     env_file:
       - ./Backend/.env
+    environment:
+      - NODE_ENV=production
     restart: always
 
   frontend:

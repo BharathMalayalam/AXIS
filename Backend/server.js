@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // Load env vars
 dotenv.config();
@@ -12,8 +14,18 @@ connectDB();
 
 const app = express();
 
-// Middlewares
+// Security Middlewares
+app.use(helmet());
 app.use(cors());
+
+// Rate limiting (100 requests per 15 minutes)
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { success: false, error: 'Too many requests, please try again later.' }
+});
+app.use('/api/', limiter);
+
 app.use(bodyParser.json());
 app.use((req, res, next) => {
     console.log(`${req.method} ${req.url} - ${new Date().toLocaleTimeString()}`);
