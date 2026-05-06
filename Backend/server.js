@@ -20,10 +20,10 @@ app.use(helmet({
 }));
 app.use(cors());
 
-// Rate limiting (100 requests per 15 minutes)
+// Rate limiting (1000 requests per 15 minutes)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
     message: { success: false, error: 'Too many requests, please try again later.' }
 });
 app.use('/api/', limiter);
