@@ -61,14 +61,12 @@ export function AppProvider({ children }) {
   // --- Auth ---
   const login = async (userId, password, role) => {
     try {
-      console.log('Attempting login for:', { userId, role });
       const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, password, role })
       });
       const data = await res.json();
-      console.log('Login response:', data);
 
       if (data.success) {
         localStorage.setItem('token', data.token);
