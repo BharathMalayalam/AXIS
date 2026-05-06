@@ -15,7 +15,9 @@ connectDB();
 const app = express();
 
 // Security Middlewares
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP for now so images/scripts load on IP address
+}));
 app.use(cors());
 
 // Rate limiting (100 requests per 15 minutes)
