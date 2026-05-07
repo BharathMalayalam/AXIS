@@ -3,7 +3,7 @@ services:
     build: ./Backend
     container_name: axis-backend
     ports:
-      - "5001:5000"
+      - "5000:5000"
     env_file:
       - ./Backend/.env
     environment:
@@ -14,7 +14,7 @@ services:
     build: ./Frontend
     container_name: axis-frontend
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - backend
     restart: always
