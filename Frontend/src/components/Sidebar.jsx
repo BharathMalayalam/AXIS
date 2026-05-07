@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
@@ -11,6 +11,19 @@ const Sidebar = () => {
   const { currentUser, logout } = useApp();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.classList.add('sidebar-open');
+    } else {
+      document.body.classList.remove('sidebar-open');
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('sidebar-open');
+    };
+  }, [mobileOpen]);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -109,14 +122,23 @@ const Sidebar = () => {
         <SidebarContent />
       </aside>
 
-      <button className="sidebar-mobile-toggle" onClick={() => setMobileOpen(true)}>
+      <button
+        className="sidebar-mobile-toggle"
+        onClick={() => setMobileOpen(true)}
+        aria-label="Open navigation menu"
+        aria-expanded={mobileOpen}
+      >
         <Menu size={24} />
       </button>
 
       {mobileOpen && (
         <div className="sidebar-overlay animate-fade-in" onClick={() => setMobileOpen(false)}>
-          <div className="sidebar-mobile-drawer animate-slide-right" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" style={{ position: 'absolute', top: '1rem', right: '-3.5rem', borderRadius: '50%', width: 44, height: 44, background: 'white' }} onClick={() => setMobileOpen(false)}>
+          <div className={`sidebar-mobile-drawer animate-slide-right ${mobileOpen ? 'open' : ''}`} onClick={e => e.stopPropagation()}>
+            <button
+              className="sidebar-mobile-close"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Close sidebar"
+            >
               <X size={24} />
             </button>
             <SidebarContent />
