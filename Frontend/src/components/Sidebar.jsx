@@ -68,7 +68,7 @@ const Sidebar = () => {
       <div className="sidebar-nav">
         <div className="nav-group">
           <span className="nav-group-label">Core Workspace</span>
-          <div className="nav-links" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div className="nav-links">
             {links.map((link) => (
               <NavLink
                 key={link.path}
@@ -77,9 +77,9 @@ const Sidebar = () => {
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
               >
-                <span style={{ display: 'flex' }}>{link.icon}</span>
+                <span className="link-icon">{link.icon}</span>
                 <span className="link-text">{link.name}</span>
-                <ChevronRight className="link-chevron" size={14} style={{ marginLeft: 'auto' }} />
+                <ChevronRight className="link-chevron" size={16} />
               </NavLink>
             ))}
           </div>
@@ -88,27 +88,25 @@ const Sidebar = () => {
         <div className="nav-group">
           <span className="nav-group-label">Insights</span>
           <div className="nav-links">
-            <button className="sidebar-link" style={{ opacity: 0.5, cursor: 'not-allowed' }}>
-              <span style={{ display: 'flex' }}><Sparkles size={20} /></span>
+            <button className="sidebar-link sidebar-link-disabled" disabled>
+              <span className="link-icon"><Sparkles size={20} /></span>
               <span className="link-text">AI Analytics</span>
-              <span className="badge-progress" style={{ fontSize: '0.6rem', padding: '2px 4px', borderRadius: '4px', marginLeft: 'auto' }}>PRO</span>
+              <span className="sidebar-badge">PRO</span>
             </button>
           </div>
         </div>
       </div>
 
       <div className="sidebar-footer">
-        <div className="user-pill glass" style={{ background: 'rgba(255,255,255,0.05)', padding: '0.75rem', borderRadius: '12px', color: 'white', border: '1px solid rgba(255,255,255,0.1)' }}>
+        <div className="sidebar-profile-card">
           <div className="avatar avatar-sm avatar-primary" style={{ background: 'var(--primary-light)' }}>
             {currentUser?.name?.charAt(0)?.toUpperCase()}
           </div>
-          <div className="flex flex-col truncate" style={{ flex: 1 }}>
-            <span className="font-bold text-xs" style={{ color: 'white' }}>{currentUser?.name}</span>
-            <span className="text-xs text-success" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'currentColor' }}></div> Online
-            </span>
+          <div className="profile-summary">
+            <span className="profile-name">{currentUser?.name}</span>
+            <span className="profile-role">Online · {currentUser?.role?.replace(/([A-Z])/g, ' $1')}</span>
           </div>
-          <button className="btn-icon-sm" onClick={handleLogout} style={{ color: 'rgba(255,255,255,0.4)' }}>
+          <button className="btn-icon-sm sidebar-logout-btn" onClick={handleLogout} aria-label="Sign out">
             <LogOut size={16} />
           </button>
         </div>
