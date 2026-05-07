@@ -23,14 +23,14 @@ import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 
 function ProtectedLayout({ allowedRoles, children }) {
-  const { currentUser } = useApp();
+  const { currentUser, sidebarCollapsed } = useApp();
   if (!currentUser) return <Navigate to="/login" replace />;
   const userRole = currentUser.role?.toLowerCase();
   if (!allowedRoles.map(r => r.toLowerCase()).includes(userRole)) return <Navigate to="/" replace />;
   return (
     <div className="app-layout">
       <Sidebar />
-      <div className="main-content">
+      <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <Navbar />
         <div className="page-content animate-fade-in">
           {children}

@@ -4,11 +4,11 @@ import { useApp } from '../context/AppContext';
 import {
   LayoutDashboard, Briefcase, Users, UserCheck,
   ClipboardCheck, Layers, MessageSquare, LogOut,
-  ShieldCheck, ChevronRight, Menu, X, Sparkles
+  ShieldCheck, ChevronRight, Menu, X, Sparkles, ChevronLeft
 } from 'lucide-react';
 
 const Sidebar = () => {
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, sidebarCollapsed, toggleSidebar } = useApp();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -116,7 +116,14 @@ const Sidebar = () => {
 
   return (
     <>
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarCollapsed ? 'collapsed' : ''}`}>
+        <button
+          className="sidebar-collapse-btn"
+          onClick={toggleSidebar}
+          aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {sidebarCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
+        </button>
         <SidebarContent />
       </aside>
 

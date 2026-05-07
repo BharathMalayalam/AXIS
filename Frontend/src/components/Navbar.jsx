@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 const Navbar = () => {
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, sidebarCollapsed } = useApp();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,7 +40,7 @@ const Navbar = () => {
   const avBg = avatarColors[currentUser?.role] || 'var(--primary)';
 
   return (
-    <header className="navbar glass">
+    <header className={`navbar glass ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <div className="navbar-left">
         <button className="btn btn-primary btn-pill btn-sm">
           <Plus size={16} /> Create

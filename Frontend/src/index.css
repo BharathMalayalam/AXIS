@@ -49,6 +49,7 @@
   --radius-2xl: 32px;
   --radius-full:9999px;
   --sidebar-width:  280px;
+  --sidebar-width-collapsed: 80px;
   --navbar-height:  72px;
   --transition-fast:  all .15s ease;
   --transition-base:  all .25s ease;
@@ -381,6 +382,110 @@ a  { text-decoration:none; color:inherit; transition:var(--transition-fast); }
   background: var(--bg-card-hover);
   transform: scale(1.05);
   box-shadow: var(--shadow-lg);
+}
+
+/* Collapse Button */
+.sidebar-collapse-btn {
+  position: absolute;
+  top: 1rem;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  z-index: 101;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-collapse-btn:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
+/* Collapsed Sidebar State */
+.sidebar.collapsed {
+  width: var(--sidebar-width-collapsed, 80px);
+}
+
+.sidebar.collapsed .sidebar-inner {
+  padding: 2rem 0.5rem;
+}
+
+.sidebar.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 0 0 2rem;
+}
+
+.sidebar.collapsed .brand-text {
+  display: none;
+}
+
+.sidebar.collapsed .brand-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.sidebar.collapsed .brand-icon img {
+  width: 28px;
+}
+
+.sidebar.collapsed .nav-group-label,
+.sidebar.collapsed .link-text,
+.sidebar.collapsed .profile-name,
+.sidebar.collapsed .profile-role,
+.sidebar.collapsed .sidebar-profile-card .profile-summary {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-link {
+  justify-content: center;
+  padding: 1rem;
+  gap: 0;
+}
+
+.sidebar.collapsed .link-icon {
+  margin: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.sidebar.collapsed .link-chevron {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-badge {
+  display: none;
+}
+
+.sidebar.collapsed .sidebar-profile-card {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-logout-btn {
+  display: none;
+}
+
+/* Main content and navbar adjustments for collapsed sidebar */
+@media (min-width: 1024px) {
+  .main-content.sidebar-collapsed {
+    margin-left: var(--sidebar-width-collapsed, 80px);
+    width: calc(100% - var(--sidebar-width-collapsed, 80px));
+  }
+
+  .navbar.sidebar-collapsed {
+    left: var(--sidebar-width-collapsed, 80px);
+    width: calc(100% - var(--sidebar-width-collapsed, 80px));
+  }
 }
 
 /* ===== PAGE HEADER ===== */

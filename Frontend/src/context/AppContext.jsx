@@ -15,6 +15,18 @@ export function AppProvider({ children }) {
   const [modules, setModules] = useState([]);
   const [queries, setQueries] = useState([]);
   const [issues, setIssues] = useState([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(prev => {
+      const newState = !prev;
+      localStorage.setItem('sidebarCollapsed', JSON.stringify(newState));
+      return newState;
+    });
+  };
 
   const getHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
@@ -222,6 +234,7 @@ export function AppProvider({ children }) {
     queries, addQuery, replyQuery,
     issues,
     getAdminStats, getTLStats, getDevStats,
+    sidebarCollapsed, toggleSidebar,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
