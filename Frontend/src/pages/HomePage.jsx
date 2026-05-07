@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
-  ArrowRight, CheckCircle2, BarChart3, Zap,
-  Layout, MessageSquare, Shield, Users, Briefcase, ChevronRight, Play, Star
+  ArrowRight, CheckCircle2, Zap,
+  Layout, Shield, Users, Briefcase, Play, Star, Globe, Rocket, Award
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -12,16 +12,7 @@ const HomePage = () => {
   const [visibleSections, setVisibleSections] = useState({});
 
   useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setScrollY(window.scrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
+    const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     const observer = new IntersectionObserver((entries) => {
@@ -32,8 +23,7 @@ const HomePage = () => {
       });
     }, { threshold: 0.1 });
 
-    const sections = ['hero-pinned-content', 'features-section', 'roles-section'];
-    sections.forEach(id => {
+    ['hero', 'features', 'roles', 'trust', 'cta'].forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -51,167 +41,104 @@ const HomePage = () => {
     : '/login';
 
   return (
-    <div style={{ background: '#ffffff', minHeight: '100vh', overflowX: 'hidden', color: '#172B4D', fontFamily: "'Inter', sans-serif" }}>
-
+    <div className="hp-wrapper">
       {/* ── Navbar ── */}
-      <div style={{ padding: '1.5rem 5% 0', position: 'fixed', width: '100%', zIndex: 1000 }}>
-        <nav style={{
-          maxWidth: '1200px', margin: '0 auto',
-          background: 'rgba(255, 255, 255, 0.9)',
-          backdropFilter: 'blur(12px)',
-          borderRadius: '100px',
-          height: '76px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 2.5rem',
-          boxShadow: '0 10px 40px rgba(9, 30, 66, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
-          transform: scrollY > 50 ? 'translateY(-10px) scale(0.98)' : 'translateY(0) scale(1)',
-          transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-            <div style={{ width: '36px', height: '36px', background: '#0052CC', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <img src="/axis-logo.png" alt="AXIS" style={{ width: '24px', filter: 'brightness(10)' }} />
+      <nav className={`hp-nav ${scrollY > 50 ? 'hp-nav-scrolled' : ''}`}>
+        <div className="hp-nav-container">
+          <Link to="/" className="hp-logo">
+            <div className="hp-logo-icon">
+              <img src="/axis-logo.png" alt="AXIS" />
             </div>
-            <span style={{ fontSize: '1.375rem', fontWeight: '900', color: '#0052CC', letterSpacing: '-0.04em' }}>AXIS</span>
-          </div>
+            <span>AXIS</span>
+          </Link>
 
-          <div style={{ display: 'flex', gap: '2rem' }} className="nav-links-desktop">
-            {['Features', 'Solutions', 'Pricing', 'Resources'].map(n => (
-              <span key={n} style={{ fontSize: '0.9rem', fontWeight: '600', color: '#42526E', cursor: 'pointer', transition: 'color 0.2s' }} className="nav-text-link">{n}</span>
+          <div className="hp-nav-links">
+            {['Features', 'Solutions', 'Enterprise', 'Resources'].map(n => (
+              <a key={n} href={`#${n.toLowerCase()}`} className="hp-nav-link">{n}</a>
             ))}
           </div>
 
-          <Link to={dashboardPath} style={{
-            padding: '0.75rem 1.75rem', background: '#0052CC', color: '#fff',
-            borderRadius: '50px', fontWeight: '700', fontSize: '0.9rem',
-            boxShadow: '0 8px 20px rgba(0, 82, 204, 0.25)', transition: 'all 0.3s',
-            textDecoration: 'none'
-          }} className="nav-cta">
-            {currentUser ? 'Dashboard' : 'Login'}
-          </Link>
-        </nav>
-      </div>
+          <div className="hp-nav-actions">
+            {!currentUser && <Link to="/login" className="hp-nav-btn-text">Log in</Link>}
+            <Link to={dashboardPath} className="btn btn-primary btn-pill btn-lg">
+              {currentUser ? 'Go to Dashboard' : 'Get AXIS Free'}
+              <ArrowRight size={18} />
+            </Link>
+          </div>
+        </div>
+      </nav>
 
-      {/* ── Hero Section with Scroll Pinning ── */}
-      <section style={{ height: '120vh', position: 'relative' }}>
-        <div style={{
-          position: 'sticky',
-          top: 0,
-          height: '120vh',
-          display: 'flex',
-          alignItems: 'flex-start', 
-          paddingTop: '160px', 
-          overflow: 'hidden',
-          background: 'radial-gradient(circle at top right, #E3FCEF 0%, #ffffff 40%)',
-        }}>
-          {/* Background Design */}
-          <div style={{ position: 'absolute', top: '100px', right: '15%', width: '2px', height: '100%', background: '#36B37E', opacity: 0.3, zIndex: 0 }} />
+      {/* ── Hero Section ── */}
+      <section id="hero" className="hp-hero">
+        <div className="hp-hero-bg">
+          <div className="blob blob-1"></div>
+          <div className="blob blob-2"></div>
+          <div className="blob blob-3"></div>
+        </div>
 
-          <div id="hero-pinned-content" style={{ 
-            maxWidth: '1300px', margin: '0 auto', 
-            display: 'flex', alignItems: 'flex-start', gap: '6rem', 
-            zIndex: 1, flexWrap: 'wrap', padding: '0 8%',
-          }}>
+        <div className="hp-container">
+          <div className="hp-hero-content">
+            <div className="hp-hero-tag animate-up stagger-1">
+              <Star size={14} fill="currentColor" />
+              <span>Next-Gen Project Management</span>
+            </div>
             
-            {/* Hero Left Content */}
-            <div style={{ flex: '1.2', minWidth: '400px' }}>
-              <h1 style={{
-                fontSize: 'clamp(2.5rem, 6vw, 4.25rem)',
-                fontWeight: '900', color: '#172B4D',
-                lineHeight: '1.1',
-                letterSpacing: '-0.05em',
-                marginBottom: '2rem',
-              }}>
-                Build fast. Stay focused. Deliver smarter with <span style={{ color: '#0052CC' }}>AXIS</span>
-              </h1>
-              
-              <p style={{
-                fontSize: '1.125rem', color: '#42526E',
-                lineHeight: '1.8', marginBottom: '3.5rem',
-                maxWidth: '540px',
-              }}>
-                The project management platform for agile software teams. AXIS helps you plan, track, and release great software — together.
-              </p>
+            <h1 className="hp-hero-title animate-up stagger-2">
+              Accelerate your team's <span className="text-gradient">velocity</span> with AXIS
+            </h1>
+            
+            <p className="hp-hero-subtitle animate-up stagger-3">
+              The premium agile platform that scales with your ambition. Plan intuitively, track precisely, and release software that matters.
+            </p>
 
-              <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '4rem', flexWrap: 'wrap' }}>
-                <Link to={dashboardPath} style={{
-                  padding: '1.125rem 2.5rem', background: '#DEEBFF', color: '#0052CC',
-                  borderRadius: '50px', fontWeight: '700', fontSize: '1rem',
-                  transition: 'all 0.3s', display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
-                  textDecoration: 'none', border: '1px solid #B3D4FF'
-                }} className="hero-cta-light">
-                  Contact us
-                </Link>
-                <button style={{
-                  padding: '1.125rem 2.5rem', background: '#253858', color: '#fff',
-                  borderRadius: '50px', fontWeight: '700', fontSize: '1rem',
-                  transition: 'all 0.3s', cursor: 'pointer', border: 'none',
-                  boxShadow: '0 10px 30px rgba(37, 56, 88, 0.2)',
-                }} className="hero-cta-dark">
-                  Explore Solutions
-                </button>
+            <div className="hp-hero-btns animate-up" style={{ animationDelay: '0.4s' }}>
+              <Link to={dashboardPath} className="btn btn-primary btn-xl btn-pill">
+                Start your journey
+                <Rocket size={20} />
+              </Link>
+              <button className="btn btn-ghost btn-xl btn-pill">
+                <Play size={20} fill="currentColor" />
+                Watch Demo
+              </button>
+            </div>
+
+            <div className="hp-hero-trust animate-up" style={{ animationDelay: '0.5s' }}>
+              <div className="hp-avatars">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <img key={i} src={`https://i.pravatar.cc/100?img=${i + 20}`} alt="user" />
+                ))}
               </div>
+              <div className="hp-trust-text">
+                <strong>Joined by 10,000+</strong> engineering teams worldwide
+              </div>
+            </div>
+          </div>
 
-              {/* Stats */}
-              <div style={{ display: 'flex', gap: '5rem', flexWrap: 'wrap' }}>
-                <div>
-                  <p style={{ fontSize: '0.8rem', color: '#6B778C', fontWeight: '700', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Teams Trusted on</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ display: 'flex' }}>
-                      {[1, 2, 3, 4].map(i => (
-                        <div key={i} style={{ 
-                          width: '36px', height: '36px', borderRadius: '50%', border: '2px solid #fff', 
-                          marginLeft: '-10px', overflow: 'hidden', background: '#F4F5F7',
-                          zIndex: 5-i
-                        }}>
-                          <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="user" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        </div>
-                      ))}
-                    </div>
-                    <span style={{ fontSize: '1.375rem', fontWeight: '900', color: '#172B4D' }}>100K+</span>
+          <div className="hp-hero-visual animate-fade" style={{ animationDelay: '0.6s' }}>
+            <div className="hp-dashboard-preview glass">
+              <div className="hp-preview-header">
+                <div className="hp-preview-dots"><span></span><span></span><span></span></div>
+                <div className="hp-preview-search">Search projects...</div>
+              </div>
+              <div className="hp-preview-body">
+                <div className="hp-preview-sidebar">
+                  {[1, 2, 3, 4].map(i => <div key={i} className="hp-sidebar-item"></div>)}
+                </div>
+                <div className="hp-preview-content">
+                  <div className="hp-content-top"></div>
+                  <div className="hp-content-grid">
+                    <div className="hp-grid-card"></div>
+                    <div className="hp-grid-card"></div>
+                    <div className="hp-grid-card"></div>
                   </div>
                 </div>
-                <div>
-                  <p style={{ fontSize: '0.8rem', color: '#6B778C', fontWeight: '700', marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Modules Delivered</p>
-                  <div style={{ fontSize: '1.375rem', fontWeight: '900', color: '#172B4D' }}>3.5M+</div>
-                </div>
               </div>
-            </div>
-
-            {/* Hero Right */}
-            <div style={{ flex: '1', position: 'relative', display: 'flex', justifyContent: 'center' }}>
-              <div style={{
-                width: '100%', maxWidth: '480px',
-                height: '580px',
-                borderRadius: '40px 40px 100px 40px',
-                border: '2px solid #36B37E',
-                padding: '0.75rem',
-                position: 'relative',
-                background: 'rgba(255, 255, 255, 0.4)',
-              }}>
-                <div style={{ width: '100%', height: '100%', borderRadius: '30px 30px 90px 30px', overflow: 'hidden' }}>
-                  <img 
-                    src="https://thumbs.dreamstime.com/b/teamwork-team-together-collaboration-business-communication-outd-outdoors-concept-48568990.jpg" 
-                    alt="Team Collaboration" 
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-
-                {/* Floating Badge */}
-                <div style={{
-                  position: 'absolute', 
-                  left: '-40px', 
-                  top: '60px',
-                  transform: `translateY(${Math.min((scrollY / (window.innerHeight * 0.45)) * 380, 420)}px)`,
-                  background: '#fff', border: '2px solid #36B37E', borderRadius: '24px',
-                  padding: '1.5rem', width: '220px',
-                  boxShadow: '0 20px 50px rgba(54, 179, 126, 0.15)',
-                  zIndex: 10,
-                  transition: 'transform 0.1s ease-out'
-                }}>
-                  <p style={{ fontSize: '0.9rem', color: '#36B37E', fontWeight: '700', lineHeight: '1.5' }}>
-                    Plan with clarity. Execute with speed. Succeed together
-                  </p>
+              {/* Floating Element */}
+              <div className="hp-floating-card glass animate-float">
+                <div className="hp-floating-icon"><Zap size={20} /></div>
+                <div>
+                  <div className="hp-floating-label">Velocity</div>
+                  <div className="hp-floating-value">+24%</div>
                 </div>
               </div>
             </div>
@@ -219,120 +146,522 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section id="features-section" style={{ padding: '8rem 8%', background: '#fff' }}>
-        <div style={{ 
-          textAlign: 'center', maxWidth: '700px', margin: '0 auto 6rem',
-          opacity: visibleSections['features-section'] ? 1 : 0,
-          transform: visibleSections['features-section'] ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
-        }}>
-          <span style={{ color: '#0052CC', fontWeight: '800', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Core Capabilities</span>
-          <h2 style={{ fontSize: '2.75rem', fontWeight: '900', color: '#172B4D', marginTop: '1rem' }}>Everything your team needs to plan, track, and ship great software</h2>
-        </div>
+      {/* ── Features Section ── */}
+      <section id="features" className={`hp-features ${visibleSections['features'] ? 'section-visible' : ''}`}>
+        <div className="hp-container">
+          <div className="hp-section-header">
+            <span className="hp-section-tag">Powerful Core</span>
+            <h2 className="hp-section-title">Built for the modern workflow</h2>
+            <p className="hp-section-desc">Sophisticated tools designed to keep your team in the flow state.</p>
+          </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2.5rem', maxWidth: '1200px', margin: '0 auto' }} className="features-grid">
-          {[
-            { icon: <Layout size={32} />, title: 'Plan with Agility', desc: 'Create user stories, plan sprints, and distribute tasks across your software team.', color: '#0052CC' },
-            { icon: <Zap size={32} />, title: 'Track in Real-Time', desc: 'Prioritize and discuss your team\'s work in full context with complete visibility.', color: '#FFAB00' },
-            { icon: <Shield size={32} />, title: 'Release with Confidence', desc: 'Ship on-time software with confidence knowing information is always up-to-date.', color: '#36B37E' },
-          ].map((f, i) => (
-            <div key={i} style={{
-              padding: '3rem 2.5rem', borderRadius: '32px', border: '1px solid #DFE1E6',
-              transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)', cursor: 'default',
-              opacity: visibleSections['features-section'] ? 1 : 0,
-              transform: visibleSections['features-section'] ? 'translateY(0)' : 'translateY(50px)',
-              transitionDelay: `${i * 150}ms`,
-              boxShadow: '0 4px 12px rgba(9, 30, 66, 0.04)'
-            }} className="feature-card-new">
-              <div style={{ color: f.color, marginBottom: '2rem' }}>{f.icon}</div>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.25rem' }}>{f.title}</h3>
-              <p style={{ color: '#42526E', lineHeight: '1.7', fontSize: '1rem' }}>{f.desc}</p>
-            </div>
-          ))}
+          <div className="hp-features-grid">
+            {[
+              { icon: <Layout />, title: 'Smart Planning', desc: 'Predictive sprint planning that adapts to your team\'s historical velocity.', color: 'blue' },
+              { icon: <Zap />, title: 'Instant Insights', desc: 'Real-time analytics dashboards that visualize bottlenecks before they happen.', color: 'teal' },
+              { icon: <Shield />, title: 'Enterprise Security', desc: 'Military-grade encryption and granular RBAC to protect your intellectual property.', color: 'purple' },
+              { icon: <Globe />, title: 'Global Sync', desc: 'Seamless collaboration for distributed teams with zero latency updates.', color: 'indigo' },
+              { icon: <Award />, title: 'Quality Guard', desc: 'Automated verification workflows to ensure every release meets your standards.', color: 'green' },
+              { icon: <Users />, title: 'Social Dev', desc: 'Integrated discussion threads and pair programming tools built-in.', color: 'orange' },
+            ].map((f, i) => (
+              <div key={i} className="hp-feature-card">
+                <div className={`hp-feature-icon hp-icon-${f.color}`}>{f.icon}</div>
+                <h3>{f.title}</h3>
+                <p>{f.desc}</p>
+                <div className="hp-feature-link">Learn more <ArrowRight size={16} /></div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* ── Role Sections ── */}
-      <section id="roles-section" style={{ padding: '8rem 8%', background: '#F4F5F7' }}>
-         <div style={{ 
-           display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '2rem', maxWidth: '1200px', margin: '0 auto',
-           opacity: visibleSections['roles-section'] ? 1 : 0,
-           transform: visibleSections['roles-section'] ? 'translateY(0)' : 'translateY(30px)',
-           transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)'
-         }} className="roles-grid">
-            {[
-              { role: 'Admin', icon: <Shield size={28} />, desc: 'Full control over users, projects, and security compliance.' },
-              { role: 'Team Leader', icon: <Users size={28} />, desc: 'Review code, manage modules, and guide developer success.' },
-              { role: 'Developer', icon: <Briefcase size={28} />, desc: 'Focus on coding, track modules, and deliver features.' },
-            ].map((r, i) => (
-              <div key={i} style={{ background: '#fff', padding: '3rem 2.5rem', borderRadius: '32px', boxShadow: '0 10px 30px rgba(0,0,0,0.04)' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: '#DEEBFF', color: '#0052CC', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>{r.icon}</div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '800', marginBottom: '1rem' }}>{r.role}</h3>
-                <p style={{ color: '#6B778C', fontSize: '1rem', lineHeight: '1.7' }}>{r.desc}</p>
+      {/* ── Role Showcase ── */}
+      <section id="roles" className={`hp-roles ${visibleSections['roles'] ? 'section-visible' : ''}`}>
+        <div className="hp-container">
+          <div className="hp-roles-layout">
+            <div className="hp-roles-content">
+              <span className="hp-section-tag">Role-Based Experience</span>
+              <h2 className="hp-section-title">Tailored for every team member</h2>
+              <div className="hp-roles-list">
+                {[
+                  { role: 'Administrators', desc: 'Command center for project governance and team health.' },
+                  { role: 'Team Leaders', desc: 'Streamlined review processes and roadmap management.' },
+                  { role: 'Developers', desc: 'Distraction-free environment for deep coding sessions.' },
+                ].map((r, i) => (
+                  <div key={i} className="hp-role-item">
+                    <div className="hp-role-bullet"></div>
+                    <div>
+                      <h4>{r.role}</h4>
+                      <p>{r.desc}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-         </div>
+            </div>
+            <div className="hp-roles-visual">
+              <div className="hp-roles-image-stack">
+                <div className="hp-role-img img-1 glass"></div>
+                <div className="hp-role-img img-2 glass"></div>
+                <div className="hp-role-img img-3 glass"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Section ── */}
+      <section id="cta" className={`hp-cta ${visibleSections['cta'] ? 'section-visible' : ''}`}>
+        <div className="hp-container">
+          <div className="hp-cta-box glass animate-up">
+            <h2>Ready to transform your delivery?</h2>
+            <p>Join thousands of high-performing teams using AXIS to build the future.</p>
+            <div className="hp-cta-btns">
+              <Link to="/login" className="btn btn-primary btn-xl btn-pill">Get Started for Free</Link>
+              <button className="btn btn-ghost btn-xl btn-pill">Talk to Sales</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer style={{ padding: '6rem 8% 4rem', background: '#091E42', color: '#fff' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '4rem', marginBottom: '5rem' }}>
-            <div style={{ maxWidth: '350px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-                <div style={{ width: '40px', height: '40px', background: '#0052CC', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <img src="/axis-logo.png" alt="AXIS" style={{ width: '28px', filter: 'brightness(10)' }} />
+      <footer className="hp-footer">
+        <div className="hp-container">
+          <div className="hp-footer-top">
+            <div className="hp-footer-brand">
+              <div className="hp-logo">
+                <div className="hp-logo-icon">
+                  <img src="/axis-logo.png" alt="AXIS" />
                 </div>
-                <span style={{ fontSize: '1.75rem', fontWeight: '900', letterSpacing: '-0.04em' }}>AXIS</span>
+                <span>AXIS</span>
               </div>
-              <p style={{ color: '#B3D4FF', lineHeight: '1.8', fontSize: '1.05rem' }}>The project management platform for modern software teams. Plan, track, and ship with confidence.</p>
+              <p>The premium project management platform for high-velocity software teams.</p>
             </div>
-            <div style={{ display: 'flex', gap: '6rem', flexWrap: 'wrap' }}>
+            <div className="hp-footer-grid">
               <div>
-                <h4 style={{ fontWeight: '800', marginBottom: '1.75rem', fontSize: '1.125rem' }}>Product</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#B3D4FF', fontSize: '1rem' }}>
-                  <span>Features</span><span>Pricing</span><span>Integrations</span>
-                </div>
+                <h4>Product</h4>
+                <ul>
+                  <li><a href="#">Changelog</a></li>
+                  <li><a href="#">Documentation</a></li>
+                  <li><a href="#">API</a></li>
+                </ul>
               </div>
               <div>
-                <h4 style={{ fontWeight: '800', marginBottom: '1.75rem', fontSize: '1.125rem' }}>Company</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', color: '#B3D4FF', fontSize: '1rem' }}>
-                  <span>About</span><span>Careers</span><span>Contact</span>
-                </div>
+                <h4>Company</h4>
+                <ul>
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Privacy</a></li>
+                </ul>
+              </div>
+              <div>
+                <h4>Support</h4>
+                <ul>
+                  <li><a href="#">Help Center</a></li>
+                  <li><a href="#">Community</a></li>
+                  <li><a href="#">Status</a></li>
+                </ul>
               </div>
             </div>
           </div>
-          <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '3rem', textAlign: 'center', color: '#6B778C', fontSize: '0.95rem' }}>
-            © 2026 AXIS Intelligence Systems. All rights reserved.
+          <div className="hp-footer-bottom">
+            <p>© 2026 AXIS Intelligence Systems. Crafted for excellence.</p>
+            <div className="hp-socials">
+              {/* Social icons could go here */}
+            </div>
           </div>
         </div>
       </footer>
 
       <style>{`
-        .nav-text-link:hover { color: #0052CC !important; }
-        .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0, 82, 204, 0.4) !important; background: #0747A6 !important; }
-        .hero-cta-light:hover { background: #B3D4FF !important; transform: translateY(-2px); }
-        .hero-cta-dark:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(37, 56, 88, 0.3) !important; background: #172B4D !important; }
-        .feature-card-new:hover { border-color: #0052CC !important; transform: translateY(-8px); box-shadow: 0 20px 40px rgba(9, 30, 66, 0.08); }
-        
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-15px); }
-          100% { transform: translateY(0px); }
+        .hp-wrapper {
+          background: #ffffff;
+          color: var(--text-primary);
+          overflow-x: hidden;
         }
-        .animate-float { animation: float 4s ease-in-out infinite; }
 
-        @media (max-width: 1200px) {
-          .nav-links-desktop { display: none !important; }
-          .hero-section { text-align: center; }
-          .hero-left { flex: 1 !important; text-align: center; }
-          .hero-right { display: none !important; }
-          .features-grid { grid-template-columns: 1fr 1fr !important; }
+        .hp-container {
+          max-width: 1300px;
+          margin: 0 auto;
+          padding: 0 2.5rem;
         }
-        @media (max-width: 640px) {
-          .features-grid { grid-template-columns: 1fr !important; }
-          .roles-grid { grid-template-columns: 1fr !important; }
+
+        /* Navbar */
+        .hp-nav {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          z-index: 1000;
+          height: 90px;
+          display: flex;
+          align-items: center;
+          transition: var(--transition-base);
+        }
+
+        .hp-nav-scrolled {
+          height: 72px;
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(20px);
+          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .hp-nav-container {
+          max-width: 1300px;
+          width: 100%;
+          margin: 0 auto;
+          padding: 0 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .hp-logo {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-weight: 900;
+          font-size: 1.5rem;
+          letter-spacing: -0.04em;
+          color: var(--primary);
+        }
+
+        .hp-logo-icon {
+          width: 40px;
+          height: 40px;
+          background: var(--primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 16px rgba(0, 82, 204, 0.2);
+        }
+
+        .hp-logo-icon img {
+          width: 26px;
+          filter: brightness(10);
+        }
+
+        .hp-nav-links {
+          display: flex;
+          gap: 2.5rem;
+        }
+
+        .hp-nav-link {
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+        }
+
+        .hp-nav-link:hover { color: var(--primary); }
+
+        .hp-nav-actions {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .hp-nav-btn-text {
+          font-weight: 600;
+          color: var(--text-secondary);
+        }
+
+        /* Hero */
+        .hp-hero {
+          position: relative;
+          padding: 200px 0 100px;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+        }
+
+        .hp-hero-bg {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+        }
+
+        .blob {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(80px);
+          opacity: 0.4;
+        }
+
+        .blob-1 { width: 500px; height: 500px; background: #DEEBFF; top: -100px; right: -100px; }
+        .blob-2 { width: 400px; height: 400px; background: #E3FCEF; bottom: 0; left: -100px; }
+        .blob-3 { width: 300px; height: 300px; background: #EAE6FF; top: 20%; left: 30%; }
+
+        .hp-hero .hp-container {
+          display: grid;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 4rem;
+          align-items: center;
+          position: relative;
+          z-index: 1;
+        }
+
+        .hp-hero-tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1rem;
+          background: var(--primary-xlight);
+          color: var(--primary);
+          border-radius: var(--radius-full);
+          font-size: 0.8125rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          margin-bottom: 2rem;
+        }
+
+        .hp-hero-title {
+          font-size: clamp(3rem, 5vw, 4.5rem);
+          font-weight: 900;
+          margin-bottom: 2rem;
+          line-height: 1.05;
+        }
+
+        .text-gradient {
+          background: var(--gradient-premium);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .hp-hero-subtitle {
+          font-size: 1.25rem;
+          color: var(--text-secondary);
+          margin-bottom: 3.5rem;
+          max-width: 580px;
+        }
+
+        .hp-hero-btns {
+          display: flex;
+          gap: 1.25rem;
+          margin-bottom: 4rem;
+        }
+
+        .hp-hero-trust {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .hp-avatars {
+          display: flex;
+        }
+
+        .hp-avatars img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 2px solid white;
+          margin-left: -12px;
+          box-shadow: var(--shadow-sm);
+        }
+
+        .hp-avatars img:first-child { margin-left: 0; }
+
+        .hp-trust-text {
+          font-size: 0.9375rem;
+          color: var(--text-muted);
+        }
+
+        .hp-trust-text strong { color: var(--text-primary); }
+
+        /* Hero Visual */
+        .hp-dashboard-preview {
+          width: 100%;
+          aspect-ratio: 4/3;
+          border-radius: var(--radius-xl);
+          overflow: hidden;
+          box-shadow: var(--shadow-xl);
+          display: flex;
+          flex-direction: column;
+          border: 1px solid rgba(255, 255, 255, 0.5);
+          position: relative;
+        }
+
+        .hp-preview-header {
+          height: 40px;
+          background: rgba(255, 255, 255, 0.5);
+          display: flex;
+          align-items: center;
+          padding: 0 1rem;
+          gap: 1.5rem;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .hp-preview-dots { display: flex; gap: 0.5rem; }
+        .hp-preview-dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(0, 0, 0, 0.1); }
+        .hp-preview-search { 
+          flex: 1; 
+          height: 24px; 
+          background: rgba(0, 0, 0, 0.03); 
+          border-radius: 12px;
+          font-size: 0.75rem;
+          padding: 0 0.75rem;
+          display: flex;
+          align-items: center;
+          color: rgba(0, 0, 0, 0.2);
+        }
+
+        .hp-preview-body { display: flex; flex: 1; }
+        .hp-preview-sidebar { width: 80px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; border-right: 1px solid rgba(0, 0, 0, 0.05); }
+        .hp-sidebar-item { height: 12px; background: rgba(0, 0, 0, 0.04); border-radius: 6px; }
+        .hp-preview-content { flex: 1; padding: 1.5rem; }
+        .hp-content-top { height: 20px; width: 40%; background: rgba(0, 0, 0, 0.04); border-radius: 10px; margin-bottom: 2rem; }
+        .hp-content-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+        .hp-grid-card { aspect-ratio: 1; background: rgba(0, 0, 0, 0.03); border-radius: 12px; }
+
+        .hp-floating-card {
+          position: absolute;
+          bottom: 30px;
+          left: -40px;
+          padding: 1.25rem;
+          border-radius: var(--radius-lg);
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          width: 180px;
+          box-shadow: var(--shadow-lg);
+        }
+
+        .hp-floating-icon {
+          width: 40px;
+          height: 40px;
+          background: var(--success);
+          color: white;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .hp-floating-label { font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; }
+        .hp-floating-value { font-size: 1.25rem; font-weight: 800; color: var(--text-primary); }
+
+        /* Sections General */
+        .hp-section-header { text-align: center; max-width: 700px; margin: 0 auto 5rem; }
+        .hp-section-tag { color: var(--primary); font-weight: 800; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 1rem; }
+        .hp-section-title { font-size: 3rem; font-weight: 900; margin-bottom: 1.5rem; }
+        .hp-section-desc { font-size: 1.125rem; color: var(--text-secondary); }
+
+        /* Features */
+        .hp-features { padding: 120px 0; }
+        .hp-features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+        
+        .hp-feature-card {
+          padding: 3rem;
+          background: #ffffff;
+          border: 1px solid var(--border);
+          border-radius: var(--radius-xl);
+          transition: var(--transition-base);
+          position: relative;
+        }
+
+        .hp-feature-card:hover {
+          border-color: var(--primary-light);
+          box-shadow: var(--shadow-xl);
+          transform: translateY(-10px);
+        }
+
+        .hp-feature-icon {
+          width: 60px;
+          height: 60px;
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 2rem;
+          font-size: 1.5rem;
+        }
+
+        .hp-icon-blue { background: #DEEBFF; color: #0052CC; }
+        .hp-icon-teal { background: #E6FCFF; color: #00B8D4; }
+        .hp-icon-purple { background: #EAE6FF; color: #6554C0; }
+        .hp-icon-indigo { background: #E0E7FF; color: #4F46E5; }
+        .hp-icon-green { background: #E3FCEF; color: #36B37E; }
+        .hp-icon-orange { background: #FFFAE6; color: #FFAB00; }
+
+        .hp-feature-card h3 { font-size: 1.375rem; font-weight: 800; margin-bottom: 1rem; }
+        .hp-feature-card p { color: var(--text-secondary); line-height: 1.7; margin-bottom: 2rem; }
+        .hp-feature-link { font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; font-size: 0.9375rem; }
+
+        /* Roles */
+        .hp-roles { padding: 120px 0; background: #F8F9FC; }
+        .hp-roles-layout { display: grid; grid-template-columns: 1fr 1.1fr; gap: 6rem; align-items: center; }
+        .hp-roles-list { margin-top: 3.5rem; display: flex; flex-direction: column; gap: 2.5rem; }
+        .hp-role-item { display: flex; gap: 1.5rem; }
+        .hp-role-bullet { width: 12px; height: 12px; border-radius: 50%; background: var(--primary); margin-top: 0.5rem; flex-shrink: 0; box-shadow: 0 0 0 4px var(--primary-xlight); }
+        .hp-role-item h4 { font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .hp-role-item p { color: var(--text-secondary); }
+
+        .hp-roles-image-stack { position: relative; height: 500px; width: 100%; }
+        .hp-role-img { position: absolute; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+        .img-1 { width: 80%; height: 60%; top: 0; right: 0; background: linear-gradient(135deg, #0052CC 0%, #2684FF 100%); opacity: 0.8; z-index: 1; }
+        .img-2 { width: 70%; height: 50%; bottom: 10%; left: 0; background: linear-gradient(135deg, #36B37E 0%, #00B8D4 100%); opacity: 0.9; z-index: 2; }
+        .img-3 { width: 60%; height: 40%; top: 20%; left: 10%; background: linear-gradient(135deg, #6554C0 0%, #FFAB00 100%); opacity: 1; z-index: 3; }
+
+        /* CTA */
+        .hp-cta { padding: 100px 0; }
+        .hp-cta-box {
+          padding: 6rem 4rem;
+          border-radius: var(--radius-2xl);
+          background: var(--gradient-premium);
+          color: white;
+          text-align: center;
+          border: none;
+        }
+
+        .hp-cta-box h2 { font-size: 3.5rem; color: white; margin-bottom: 1.5rem; }
+        .hp-cta-box p { font-size: 1.25rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 3.5rem; }
+        .hp-cta-btns { display: flex; justify-content: center; gap: 1.5rem; }
+        .hp-cta-btns .btn-ghost { color: white; border-color: rgba(255, 255, 255, 0.3); }
+        .hp-cta-btns .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* Footer */
+        .hp-footer { padding: 100px 0 50px; border-top: 1px solid var(--border); }
+        .hp-footer-top { display: flex; justify-content: space-between; margin-bottom: 6rem; flex-wrap: wrap; gap: 4rem; }
+        .hp-footer-brand { max-width: 300px; }
+        .hp-footer-brand p { margin-top: 1.5rem; }
+        .hp-footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5rem; }
+        .hp-footer-grid h4 { font-size: 1rem; font-weight: 800; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .hp-footer-grid ul { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+        .hp-footer-grid a { color: var(--text-secondary); font-size: 0.9375rem; }
+        .hp-footer-grid a:hover { color: var(--primary); }
+        
+        .hp-footer-bottom { border-top: 1px solid var(--border); padding-top: 3rem; display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 0.875rem; }
+
+        /* Section visibility logic */
+        .section-visible .animate-up { opacity: 1; transform: translateY(0); }
+        .hp-features-grid > * { opacity: 0; transform: translateY(30px); transition: var(--transition-slow); }
+        .section-visible .hp-features-grid > * { opacity: 1; transform: translateY(0); }
+        .section-visible .hp-features-grid > *:nth-child(1) { transition-delay: 0.1s; }
+        .section-visible .hp-features-grid > *:nth-child(2) { transition-delay: 0.2s; }
+        .section-visible .hp-features-grid > *:nth-child(3) { transition-delay: 0.3s; }
+        .section-visible .hp-features-grid > *:nth-child(4) { transition-delay: 0.4s; }
+        .section-visible .hp-features-grid > *:nth-child(5) { transition-delay: 0.5s; }
+        .section-visible .hp-features-grid > *:nth-child(6) { transition-delay: 0.6s; }
+
+        @media (max-width: 1024px) {
+          .hp-nav-links { display: none; }
+          .hp-hero .hp-container { grid-template-columns: 1fr; text-align: center; }
+          .hp-hero-content { display: flex; flex-direction: column; align-items: center; }
+          .hp-hero-subtitle { margin-inline: auto; }
+          .hp-hero-btns { justify-content: center; }
+          .hp-hero-trust { justify-content: center; }
+          .hp-features-grid { grid-template-columns: repeat(2, 1fr); }
+          .hp-roles-layout { grid-template-columns: 1fr; }
+          .hp-roles-visual { display: none; }
+        }
+
+        @media (max-width: 768px) {
+          .hp-features-grid { grid-template-columns: 1fr; }
+          .hp-hero-title { font-size: 2.75rem; }
+          .hp-cta-box h2 { font-size: 2.5rem; }
+          .hp-footer-top { flex-direction: column; }
+          .hp-footer-grid { grid-template-columns: repeat(2, 1fr); gap: 3rem; }
         }
       `}</style>
     </div>

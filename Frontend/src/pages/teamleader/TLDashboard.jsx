@@ -1,123 +1,153 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Briefcase, Layers, Clock, CheckCircle2, AlertCircle, ChevronRight } from 'lucide-react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { 
+  Briefcase, Layers, Clock, CheckCircle2, AlertCircle, 
+  ChevronRight, ArrowUpRight, TrendingUp, Filter, MoreHorizontal
+} from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 const TLDashboard = () => {
   const { currentUser, projects, modules, getTLStats } = useApp();
-  const [stats, setStats] = useState({ totalProjects: 0, activeProjects: 0, totalModules: 0, pendingReview: 0, completedModules: 0 });
+  const [stats, setStats] = useState({ 
+    totalProjects: 0, activeProjects: 0, totalModules: 0, 
+    pendingReview: 0, completedModules: 0 
+  });
 
   useEffect(() => {
     getTLStats().then(s => { if (s) setStats(s); });
-  }, [projects, modules]);
+  }, [projects, modules, getTLStats]);
 
-  const myProjects  = projects.filter(p => (p.assignedTL?._id || p.assignedTL) === currentUser?._id);
+  const myProjects  = (projects || []).filter(p => (p.assignedTL?._id || p.assignedTL) === currentUser?._id);
   const myProjectIds = myProjects.map(p => p._id);
-  const myModules   = modules.filter(m => myProjectIds.includes(m.projectId?._id || m.projectId));
+  const myModules   = (modules || []).filter(m => myProjectIds.includes(m.projectId?._id || m.projectId));
 
   const pieData = [
-    { name: 'Completed',     value: stats.completedModules, color: '#36B37E' },
-    { name: 'Pending Review', value: stats.pendingReview,  color: '#FFAB00' },
-    { name: 'In Progress',   value: Math.max(0, stats.totalModules - stats.completedModules - stats.pendingReview), color: '#0052CC' },
+    { name: 'Completed',     value: stats.completedModules || 0, color: 'var(--success)' },
+    { name: 'Reviewing',     value: stats.pendingReview || 0,  color: 'var(--warning)' },
+    { name: 'In Progress',   value: Math.max(0, (stats.totalModules || 0) - (stats.completedModules || 0) - (stats.pendingReview || 0)), color: 'var(--primary)' },
   ].filter(d => d.value > 0);
 
   const statCards = [
-    { label: 'My Projects',     value: stats.totalProjects,   icon: <Briefcase size={20} />, color: '#0052CC', bg: '#DEEBFF' },
-    { label: 'Total Modules',   value: stats.totalModules,    icon: <Layers size={20} />,    color: '#00B8D4', bg: '#E6FCFF' },
-    { label: 'Pending Review',  value: stats.pendingReview,   icon: <Clock size={20} />,     color: '#FFAB00', bg: '#FFFAE6' },
-    { label: 'Approved Modules',value: stats.completedModules,icon: <CheckCircle2 size={20} />,color: '#36B37E', bg: '#E3FCEF' },
+    { label: 'Active Projects', value: stats.totalProjects || 0,   icon: <Briefcase size={22} />, color: 'var(--primary)', bg: 'var(--primary-xlight)' },
+    { label: 'Managed Modules', value: stats.totalModules || 0,    icon: <Layers size={22} />,    color: 'var(--accent)', bg: 'var(--accent-xlight)' },
+    { label: 'Awaiting Review', value: stats.pendingReview || 0,   icon: <Clock size={22} />,     color: 'var(--warning)', bg: 'var(--warning-xlight)' },
+    { label: 'Verified Work',   value: stats.completedModules || 0, icon: <CheckCircle2 size={22} />,color: 'var(--success)', bg: 'var(--success-xlight)' },
   ];
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">Team Leader Dashboard</h1>
-          <p className="page-subtitle">Monitoring project modules and team performance.</p>
+        <div className="header-content">
+          <h1 className="page-title">Operations Dashboard</h1>
+          <p className="page-subtitle">Welcome, {currentUser?.name}. You have {stats.pendingReview} modules awaiting verification.</p>
+        </div>
+        <div className="header-actions">
+          <button className="btn btn-ghost btn-pill"><Filter size={18} /> Filter Views</button>
+          <button className="btn btn-primary btn-pill"><TrendingUp size={18} /> Performance Report</button>
         </div>
       </div>
 
       {/* Stat Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '1.5rem' }} className="tl-stats-grid">
+      <div className="dashboard-grid grid-4 mb-xl">
         {statCards.map((card, i) => (
-          <div key={i} style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.375rem', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)', borderTop: `3px solid ${card.color}`, transition: 'all 0.2s', cursor: 'default' }} className="stat-card-hover">
-            <div style={{ width: '46px', height: '46px', borderRadius: '10px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {card.icon}
+          <div key={i} className="glass-card stat-card stagger-1" style={{ '--delay': `${i * 0.1}s` }}>
+            <div className="stat-card-header">
+              <div className="stat-icon-wrapper" style={{ background: card.bg, color: card.color }}>
+                {card.icon}
+              </div>
+              <div className="stat-trend text-success">
+                <ArrowUpRight size={14} />
+                <span>+8%</span>
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#172B4D', lineHeight: 1.1, fontFamily: "'Outfit', sans-serif" }}>{card.value}</div>
-              <div style={{ fontSize: '0.775rem', color: '#6B778C', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</div>
+            <div className="stat-card-body">
+              <h3 className="stat-value">{card.value}</h3>
+              <p className="stat-label">{card.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Charts + Roadmap */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }} className="tl-chart-grid">
-        {/* Pie Chart */}
-        <div style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#172B4D', marginBottom: '1.5rem' }}>Module Completion Status</h3>
-          {pieData.length > 0 ? (
-            <div style={{ width: '100%', height: '280px' }}>
+      {/* Main Content Grid */}
+      <div className="dashboard-grid grid-2-1">
+        {/* Module Health Pie */}
+        <div className="glass-card chart-container">
+          <div className="card-header">
+            <div className="card-header-title">
+              <h3>Module Velocity</h3>
+              <p>Workload distribution across your projects</p>
+            </div>
+            <button className="btn-icon-sm"><MoreHorizontal size={16} /></button>
+          </div>
+          <div className="chart-wrapper" style={{ height: 320 }}>
+            {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={pieData} innerRadius={65} outerRadius={95} paddingAngle={4} dataKey="value" strokeWidth={0}>
+                  <Pie data={pieData} innerRadius={70} outerRadius={100} paddingAngle={8} dataKey="value" strokeWidth={0}>
                     {pieData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
                   </Pie>
-                  <Tooltip
-                    contentStyle={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '6px', boxShadow: '0 4px 12px rgba(9,30,66,0.1)', fontSize: '12px' }}
-                    itemStyle={{ color: '#172B4D' }}
+                  <Tooltip 
+                    contentStyle={{ 
+                      background: 'rgba(255, 255, 255, 0.9)', 
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '12px',
+                      boxShadow: 'var(--shadow-lg)'
+                    }} 
                   />
                 </PieChart>
               </ResponsiveContainer>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '-1rem', flexWrap: 'wrap' }}>
-                {pieData.map((d, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                    <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: d.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '0.8rem', color: '#6B778C', fontWeight: '500' }}>{d.name} ({d.value})</span>
-                  </div>
-                ))}
+            ) : (
+              <div className="table-empty-state" style={{ height: '100%' }}>
+                <div className="empty-icon"><AlertCircle size={40} /></div>
+                <p>No module data available</p>
               </div>
-            </div>
-          ) : (
-            <div className="empty-state" style={{ height: '260px' }}>
-              <AlertCircle style={{ width: '2rem', height: '2rem', opacity: 0.3, color: '#6B778C', marginBottom: '0.75rem' }} />
-              <p className="empty-state-text">No module data yet</p>
-            </div>
-          )}
+            )}
+          </div>
+          <div className="pie-legend">
+            {pieData.map((d, i) => (
+              <div key={i} className="legend-item">
+                <div className="legend-dot" style={{ background: d.color }} />
+                <span className="legend-text">{d.name} ({d.value})</span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Project Roadmap */}
-        <div style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#172B4D', marginBottom: '1.5rem' }}>Project Roadmap</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {/* Roadmap / Delivery */}
+        <div className="glass-card roadmap-container">
+          <div className="card-header">
+            <div className="card-header-title">
+              <h3>Project Roadmaps</h3>
+              <p>Overall delivery progress</p>
+            </div>
+          </div>
+          <div className="roadmap-list">
             {myProjects.length === 0 ? (
-              <div className="empty-state" style={{ height: '200px' }}>
-                <Briefcase style={{ width: '2rem', height: '2rem', opacity: 0.3, color: '#6B778C', marginBottom: '0.75rem' }} />
-                <p className="empty-state-text">No projects assigned yet.</p>
+              <div className="table-empty-state">
+                <div className="empty-icon"><Briefcase size={32} /></div>
+                <p>No active projects</p>
               </div>
             ) : (
               myProjects.slice(0, 4).map(proj => {
                 const projModules  = myModules.filter(m => (m.projectId?._id || m.projectId) === proj._id);
                 const completed    = projModules.filter(m => m.status === 'completed').length;
                 const progress     = projModules.length > 0 ? Math.round((completed / projModules.length) * 100) : 0;
-                const progressColor = progress >= 80 ? '#36B37E' : progress >= 40 ? '#0052CC' : '#FFAB00';
-
+                
                 return (
-                  <div key={proj._id} style={{ padding: '1rem 1.25rem', borderRadius: '8px', background: '#F8F9FC', border: '1px solid #EBECF0', transition: 'all 0.2s' }} className="roadmap-item">
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                      <div>
-                        <span style={{ fontSize: '0.875rem', fontWeight: '700', color: '#172B4D' }}>{proj.name}</span>
-                        <div style={{ fontSize: '0.75rem', color: '#6B778C', marginTop: '1px' }}>{projModules.length} modules</div>
+                  <div key={proj._id} className="roadmap-item-premium">
+                    <div className="roadmap-header">
+                      <div className="roadmap-info">
+                        <span className="roadmap-name">{proj.name}</span>
+                        <span className="roadmap-count">{projModules.length} modules</span>
                       </div>
-                      <span style={{ fontSize: '0.875rem', fontWeight: '800', color: progressColor }}>{progress}%</span>
+                      <span className="roadmap-percentage">{progress}%</span>
                     </div>
-                    <div style={{ height: '6px', background: '#EBECF0', borderRadius: '3px', overflow: 'hidden' }}>
-                      <div style={{ width: `${progress}%`, height: '100%', background: progressColor, borderRadius: '3px', transition: 'width 0.6s ease' }} />
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', fontSize: '0.75rem', color: '#8993A4' }}>
-                      <span>{completed} done</span>
-                      <span>{projModules.length - completed} remaining</span>
+                    <div className="progress-bar-bg">
+                      <div 
+                        className="progress-bar-fill" 
+                        style={{ width: `${progress}%`, background: progress >= 80 ? 'var(--success)' : 'var(--primary)' }}
+                      ></div>
                     </div>
                   </div>
                 );
@@ -128,14 +158,45 @@ const TLDashboard = () => {
       </div>
 
       <style>{`
-        .stat-card-hover:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(9,30,66,0.1) !important; }
-        .roadmap-item:hover    { border-color: #B3D4FF !important; box-shadow: 0 2px 8px rgba(9,30,66,0.06); }
-        @media (max-width: 960px) {
-          .tl-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .tl-chart-grid { grid-template-columns: 1fr !important; }
+        .mb-xl { margin-bottom: 2rem; }
+        .dashboard-grid { display: grid; gap: 1.5rem; }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+        .stat-card { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+        .stat-card-header { display: flex; align-items: center; justify-content: space-between; }
+        .stat-icon-wrapper { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .stat-trend { display: flex; align-items: center; gap: 0.25rem; font-size: 0.8125rem; font-weight: 700; padding: 0.25rem 0.5rem; background: rgba(255, 255, 255, 0.5); border-radius: 20px; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+        .stat-label { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; }
+
+        .chart-container { padding: 1.5rem; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        .card-header-title h3 { font-size: 1.125rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .card-header-title p { font-size: 0.875rem; color: var(--text-muted); }
+
+        .pie-legend { display: flex; justify-content: center; gap: 1.5rem; margin-top: 1rem; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 0.5rem; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+        .legend-text { font-size: 0.8125rem; color: var(--text-muted); font-weight: 600; }
+
+        .roadmap-container { padding: 1.5rem; }
+        .roadmap-list { display: flex; flex-direction: column; gap: 1.5rem; }
+        .roadmap-item-premium { padding: 1rem; background: #FAFBFC; border: 1px solid var(--border); border-radius: var(--radius-md); transition: var(--transition-base); }
+        .roadmap-item-premium:hover { border-color: var(--primary-light); transform: scale(1.02); }
+        .roadmap-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.75rem; }
+        .roadmap-info { display: flex; flex-direction: column; }
+        .roadmap-name { font-weight: 700; color: var(--text-primary); font-size: 0.9375rem; }
+        .roadmap-count { font-size: 0.75rem; color: var(--text-muted); }
+        .roadmap-percentage { font-weight: 800; color: var(--primary); font-size: 0.9375rem; }
+
+        @media (max-width: 1200px) {
+          .grid-4 { grid-template-columns: repeat(2, 1fr); }
+          .grid-2-1 { grid-template-columns: 1fr; }
         }
+
         @media (max-width: 640px) {
-          .tl-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .grid-4 { grid-template-columns: 1fr; }
         }
       `}</style>
     </div>

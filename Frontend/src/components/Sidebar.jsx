@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   LayoutDashboard, Briefcase, Users, UserCheck,
   ClipboardCheck, Layers, MessageSquare, LogOut,
-  ShieldCheck, ChevronRight, Menu, X
+  ShieldCheck, ChevronRight, Menu, X, Sparkles
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -15,221 +15,401 @@ const Sidebar = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   const adminLinks = [
-    { name: 'Dashboard',     path: '/admin',               icon: <LayoutDashboard size={17} /> },
-    { name: 'Projects',      path: '/admin/projects',      icon: <Briefcase size={17} /> },
-    { name: 'Team Leaders',  path: '/admin/team-leaders',  icon: <UserCheck size={17} /> },
-    { name: 'Team Members',  path: '/admin/team-members',  icon: <Users size={17} /> },
-    { name: 'Approvals',     path: '/admin/approval',      icon: <ShieldCheck size={17} /> },
+    { name: 'Overview',      path: '/admin',               icon: <LayoutDashboard size={20} /> },
+    { name: 'Projects',      path: '/admin/projects',      icon: <Briefcase size={20} /> },
+    { name: 'Team Leads',    path: '/admin/team-leaders',  icon: <UserCheck size={20} /> },
+    { name: 'Members',       path: '/admin/team-members',  icon: <Users size={20} /> },
+    { name: 'Approvals',     path: '/admin/approval',      icon: <ShieldCheck size={20} /> },
   ];
 
   const tlLinks = [
-    { name: 'Dashboard',       path: '/tl',          icon: <LayoutDashboard size={17} /> },
-    { name: 'My Projects',     path: '/tl/projects', icon: <Briefcase size={17} /> },
-    { name: 'Manage Modules',  path: '/tl/modules',  icon: <Layers size={17} /> },
-    { name: 'Review Work',     path: '/tl/review',   icon: <ClipboardCheck size={17} /> },
-    { name: 'Queries',         path: '/tl/queries',  icon: <MessageSquare size={17} /> },
+    { name: 'Dashboard',       path: '/tl',          icon: <LayoutDashboard size={20} /> },
+    { name: 'Projects',        path: '/tl/projects', icon: <Briefcase size={20} /> },
+    { name: 'Modules',         path: '/tl/modules',  icon: <Layers size={20} /> },
+    { name: 'Verifications',   path: '/tl/review',   icon: <ClipboardCheck size={20} /> },
+    { name: 'Messages',        path: '/tl/queries',  icon: <MessageSquare size={20} /> },
   ];
 
   const devLinks = [
-    { name: 'Dashboard',  path: '/dev',          icon: <LayoutDashboard size={17} /> },
-    { name: 'My Modules', path: '/dev/modules',  icon: <Layers size={17} /> },
-    { name: 'Queries',    path: '/dev/queries',  icon: <MessageSquare size={17} /> },
+    { name: 'Dashboard',  path: '/dev',          icon: <LayoutDashboard size={20} /> },
+    { name: 'Modules',    path: '/dev/modules',  icon: <Layers size={20} /> },
+    { name: 'Queries',    path: '/dev/queries',  icon: <MessageSquare size={20} /> },
   ];
 
   const links = currentUser?.role === 'admin' ? adminLinks
               : currentUser?.role === 'teamleader' ? tlLinks
               : devLinks;
 
-  const roleBadgeColor = {
-    admin:      { bg: '#DEEBFF', color: '#0052CC' },
-    teamleader: { bg: '#E3FCEF', color: '#006644' },
-    developer:  { bg: '#EAE6FF', color: '#403294' },
-  };
-  const rb = roleBadgeColor[currentUser?.role] || { bg: '#F4F5F7', color: '#42526E' };
-
   const SidebarContent = () => (
-    <div style={{
-      width: '240px',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      background: '#FFFFFF',
-      borderRight: '1px solid #DFE1E6',
-    }}>
-      {/* Logo */}
-      <div style={{ padding: '1.5rem 1.25rem 1rem', borderBottom: '1px solid #F4F5F7' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{
-            width: '40px', height: '40px',
-            background: '#0052CC',
-            borderRadius: '10px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 4px 12px rgba(0,82,204,0.3)',
-            flexShrink: 0,
-          }}>
-            <img src="/axis-logo.png" alt="AXIS" style={{ width: '28px', height: '28px', objectFit: 'contain', filter: 'brightness(10)' }} />
+    <div className="sidebar-inner">
+      {/* Brand */}
+      <Link to="/" className="sidebar-brand">
+        <div className="brand-icon">
+          <img src="/axis-logo.png" alt="AXIS" />
+        </div>
+        <div className="brand-text">
+          <h2>AXIS</h2>
+          <span>ENTERPRISE</span>
+        </div>
+      </Link>
+
+      {/* Nav Section */}
+      <div className="sidebar-nav-container">
+        <div className="nav-group">
+          <span className="nav-group-label">Core Workspace</span>
+          <div className="nav-links">
+            {links.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                end={link.path === '/admin' || link.path === '/tl' || link.path === '/dev'}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+              >
+                <span className="link-icon">{link.icon}</span>
+                <span className="link-text">{link.name}</span>
+                <ChevronRight className="link-chevron" size={14} />
+              </NavLink>
+            ))}
           </div>
-          <div>
-            <h1 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0052CC', letterSpacing: '-0.03em', lineHeight: 1 }}>AXIS</h1>
-            <p style={{ fontSize: '0.6rem', color: '#6B778C', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '1px' }}>Project Management</p>
+        </div>
+
+        <div className="nav-group">
+          <span className="nav-group-label">Insights</span>
+          <div className="nav-links">
+            <button className="sidebar-link disabled">
+              <span className="link-icon"><Sparkles size={20} /></span>
+              <span className="link-text">AI Analytics</span>
+              <span className="badge-pro">PRO</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav style={{ flex: 1, padding: '1.25rem 0.75rem', overflowY: 'auto' }}>
-        <p className="section-label">Navigation</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-          {links.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              end={link.path === '/admin' || link.path === '/tl' || link.path === '/dev'}
-              onClick={() => setMobileOpen(false)}
-              style={({ isActive }) => ({
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.75rem',
-                padding: '0.625rem 0.875rem',
-                borderRadius: '6px',
-                color: isActive ? '#0052CC' : '#42526E',
-                background: isActive ? '#DEEBFF' : 'transparent',
-                fontWeight: isActive ? '700' : '500',
-                fontSize: '0.875rem',
-                textDecoration: 'none',
-                transition: 'all 0.15s ease',
-                position: 'relative',
-                borderLeft: isActive ? '3px solid #0052CC' : '3px solid transparent',
-              })}
-              className="sidebar-nav-link"
-            >
-              {({ isActive }) => (
-                <>
-                  <span style={{ color: isActive ? '#0052CC' : '#6B778C', display: 'flex', flexShrink: 0 }}>{link.icon}</span>
-                  <span style={{ flex: 1 }}>{link.name}</span>
-                  {isActive && <ChevronRight size={14} style={{ color: '#0052CC', opacity: 0.6 }} />}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </div>
-      </nav>
-
-      {/* User Footer */}
-      <div style={{ padding: '0.75rem', borderTop: '1px solid #F4F5F7' }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '0.75rem',
-          padding: '0.75rem', borderRadius: '8px',
-          background: '#F8F9FC', border: '1px solid #EBECF0',
-          marginBottom: '0.5rem',
-        }}>
-          <div style={{
-            width: '34px', height: '34px', borderRadius: '50%',
-            background: '#0052CC',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'white', fontSize: '0.8rem', fontWeight: '800', flexShrink: 0,
-          }}>
+      {/* Bottom Profile */}
+      <div className="sidebar-footer">
+        <div className="user-card-compact glass">
+          <div className="avatar-sm">
             {currentUser?.name?.charAt(0)?.toUpperCase()}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#172B4D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.name}</p>
-            <span style={{ fontSize: '0.65rem', fontWeight: '700', color: rb.color, background: rb.bg, padding: '1px 6px', borderRadius: '3px', textTransform: 'capitalize' }}>
-              {currentUser?.role}
-            </span>
+          <div className="user-details">
+            <span className="user-name">{currentUser?.name}</span>
+            <span className="user-status">Online</span>
           </div>
+          <button className="btn-logout-icon" onClick={handleLogout} title="Logout">
+            <LogOut size={16} />
+          </button>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            width: '100%', display: 'flex', alignItems: 'center', gap: '0.625rem',
-            padding: '0.5rem 0.875rem', borderRadius: '6px',
-            background: 'transparent', border: '1px solid #EBECF0',
-            color: '#42526E', fontSize: '0.875rem', fontWeight: '600',
-            cursor: 'pointer', transition: 'all 0.15s',
-          }}
-          className="logout-btn"
-        >
-          <LogOut size={16} />
-          <span>Log out</span>
-        </button>
       </div>
     </div>
   );
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside
-        className="sidebar-desktop"
-        style={{
-          width: '240px',
-          height: '100vh',
-          position: 'fixed',
-          left: 0, top: 0,
-          zIndex: 100,
-          boxShadow: '2px 0 8px rgba(9,30,66,0.04)',
-        }}
-      >
+      {/* Desktop */}
+      <aside className="sidebar-desktop glass-sidebar">
         <SidebarContent />
       </aside>
 
-      {/* Mobile Hamburger */}
-      <button
-        onClick={() => setMobileOpen(true)}
-        style={{
-          display: 'none',
-          position: 'fixed', top: '12px', left: '12px', zIndex: 200,
-          width: '40px', height: '40px', borderRadius: '8px',
-          background: '#0052CC', color: 'white',
-          border: 'none', cursor: 'pointer',
-          alignItems: 'center', justifyContent: 'center',
-        }}
-        className="mobile-menu-btn"
-      >
-        <Menu size={20} />
+      {/* Mobile Trigger */}
+      <button className="sidebar-mobile-toggle" onClick={() => setMobileOpen(true)}>
+        <Menu size={24} />
       </button>
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <>
-          <div
-            onClick={() => setMobileOpen(false)}
-            style={{ position: 'fixed', inset: 0, background: 'rgba(9,30,66,0.5)', zIndex: 150 }}
-          />
-          <aside style={{
-            position: 'fixed', left: 0, top: 0, height: '100vh', zIndex: 200,
-            animation: 'slideIn 0.25s ease',
-          }}>
-            <div style={{ position: 'absolute', top: '12px', right: '-48px' }}>
-              <button onClick={() => setMobileOpen(false)} style={{
-                width: '36px', height: '36px', borderRadius: '50%',
-                background: 'white', border: 'none', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <X size={18} />
-              </button>
-            </div>
+        <div className="sidebar-mobile-overlay animate-fade">
+          <div className="sidebar-mobile-drawer animate-slide-right">
+            <button className="btn-close-sidebar" onClick={() => setMobileOpen(false)}>
+              <X size={24} />
+            </button>
             <SidebarContent />
-          </aside>
-        </>
+          </div>
+        </div>
       )}
 
       <style>{`
-        .sidebar-nav-link:hover {
-          background: #F4F5F7 !important;
-          color: #172B4D !important;
+        .glass-sidebar {
+          background: #1A1D21; /* Deep charcoal */
+          border-right: 1px solid rgba(255, 255, 255, 0.05);
+          width: var(--sidebar-width);
+          height: 100vh;
+          position: fixed;
+          left: 0; top: 0;
+          z-index: 100;
+          color: white;
         }
-        .sidebar-nav-link:hover span:first-child {
-          color: #0052CC !important;
+
+        .sidebar-inner {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          padding: 2rem 1rem;
         }
-        .logout-btn:hover {
-          background: #FFEBE6 !important;
-          color: #BF2600 !important;
-          border-color: #FFBDAD !important;
+
+        .sidebar-brand {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0 1rem 2.5rem;
+          text-decoration: none;
         }
+
+        .brand-icon {
+          width: 42px;
+          height: 42px;
+          background: var(--primary);
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 8px 16px rgba(0, 82, 204, 0.3);
+        }
+
+        .brand-icon img {
+          width: 28px;
+          filter: brightness(10);
+        }
+
+        .brand-text h2 {
+          color: white;
+          font-size: 1.5rem;
+          font-weight: 900;
+          letter-spacing: -0.02em;
+          margin: 0;
+        }
+
+        .brand-text span {
+          font-size: 0.65rem;
+          color: rgba(255, 255, 255, 0.4);
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .sidebar-nav-container {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 2.5rem;
+        }
+
+        .nav-group-label {
+          font-size: 0.75rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          color: rgba(255, 255, 255, 0.3);
+          letter-spacing: 0.05em;
+          padding: 0 1rem 1rem;
+          display: block;
+        }
+
+        .nav-links {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+
+        .sidebar-link {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.875rem 1rem;
+          border-radius: var(--radius-md);
+          color: rgba(255, 255, 255, 0.6);
+          text-decoration: none;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          transition: var(--transition-base);
+          border: none;
+          background: transparent;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .sidebar-link:hover {
+          background: rgba(255, 255, 255, 0.05);
+          color: white;
+        }
+
+        .sidebar-link.active {
+          background: var(--primary);
+          color: white;
+          box-shadow: 0 4px 12px rgba(0, 82, 204, 0.2);
+        }
+
+        .link-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0.8;
+        }
+
+        .sidebar-link.active .link-icon {
+          opacity: 1;
+        }
+
+        .link-text {
+          flex: 1;
+        }
+
+        .link-chevron {
+          opacity: 0;
+          transform: translateX(-10px);
+          transition: var(--transition-base);
+        }
+
+        .sidebar-link:hover .link-chevron {
+          opacity: 0.5;
+          transform: translateX(0);
+        }
+
+        .sidebar-link.active .link-chevron {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        .badge-pro {
+          font-size: 0.625rem;
+          font-weight: 900;
+          background: var(--accent-gradient);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          color: white;
+        }
+
+        .sidebar-link.disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .sidebar-footer {
+          margin-top: auto;
+          padding-top: 2rem;
+        }
+
+        .user-card-compact {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: var(--radius-lg);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar-sm {
+          width: 36px;
+          height: 36px;
+          background: var(--primary-light);
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 800;
+          color: white;
+        }
+
+        .user-details {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          line-height: 1.2;
+        }
+
+        .user-name {
+          font-size: 0.875rem;
+          font-weight: 700;
+          color: white;
+        }
+
+        .user-status {
+          font-size: 0.75rem;
+          color: var(--success);
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+        }
+
+        .user-status::before {
+          content: '';
+          width: 6px;
+          height: 6px;
+          background: currentColor;
+          border-radius: 50%;
+        }
+
+        .btn-logout-icon {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.4);
+          cursor: pointer;
+          border-radius: 8px;
+          transition: var(--transition-base);
+        }
+
+        .btn-logout-icon:hover {
+          background: rgba(255, 71, 71, 0.1);
+          color: #FF4747;
+        }
+
+        /* Mobile */
+        .sidebar-mobile-toggle {
+          display: none;
+          position: fixed;
+          top: 1rem;
+          left: 1rem;
+          z-index: 1000;
+          background: white;
+          border: 1px solid var(--border);
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-mobile-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          backdrop-filter: blur(4px);
+          z-index: 2000;
+        }
+
+        .sidebar-mobile-drawer {
+          width: 280px;
+          height: 100vh;
+          background: #1A1D21;
+          position: relative;
+        }
+
+        .btn-close-sidebar {
+          position: absolute;
+          top: 1rem;
+          right: -3.5rem;
+          width: 44px;
+          height: 44px;
+          background: white;
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+
         @media (max-width: 768px) {
-          .sidebar-desktop { display: none !important; }
-          .mobile-menu-btn { display: flex !important; }
+          .sidebar-desktop { display: none; }
+          .sidebar-mobile-toggle { display: flex; }
         }
       `}</style>
     </>

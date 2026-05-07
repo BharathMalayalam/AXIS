@@ -1,115 +1,142 @@
 import { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Layers, Clock, CheckCircle2, AlertCircle, Briefcase, Send, ChevronRight } from 'lucide-react';
+import { 
+  Layers, Clock, CheckCircle2, AlertCircle, Briefcase, 
+  Send, ChevronRight, MoreHorizontal, Filter, BarChart3,
+  Calendar
+} from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const DevDashboard = () => {
   const { currentUser, modules, getDevStats } = useApp();
-  const [stats, setStats] = useState({ totalModules: 0, pendingModules: 0, submittedModules: 0, completedModules: 0 });
+  const [stats, setStats] = useState({ 
+    totalModules: 0, pendingModules: 0, 
+    submittedModules: 0, completedModules: 0 
+  });
 
   useEffect(() => {
     getDevStats().then(s => { if (s) setStats(s); });
-  }, [modules]);
+  }, [modules, getDevStats]);
 
-  const myModules = modules.filter(m => (m.assignedDev?._id || m.assignedDev) === currentUser?._id);
+  const myModules = (modules || []).filter(m => (m.assignedDev?._id || m.assignedDev) === currentUser?._id);
 
   const chartData = [
-    { name: 'To-Do',     count: stats.pendingModules,   fill: '#FFAB00' },
-    { name: 'Submitted', count: stats.submittedModules, fill: '#0052CC' },
-    { name: 'Completed', count: stats.completedModules, fill: '#36B37E' },
+    { name: 'To-Do',     count: stats.pendingModules || 0,   fill: 'var(--warning)' },
+    { name: 'Review',    count: stats.submittedModules || 0, fill: 'var(--primary)' },
+    { name: 'Finished',  count: stats.completedModules || 0, fill: 'var(--success)' },
   ];
 
   const statCards = [
-    { label: 'Total Assigned',  value: stats.totalModules,    icon: <Layers size={20} />,      color: '#0052CC', bg: '#DEEBFF' },
-    { label: 'To-Do / Rejected',value: stats.pendingModules,  icon: <Clock size={20} />,       color: '#FFAB00', bg: '#FFFAE6' },
-    { label: 'Awaiting Review', value: stats.submittedModules,icon: <Briefcase size={20} />,   color: '#00B8D4', bg: '#E6FCFF' },
-    { label: 'Finished Tasks',  value: stats.completedModules,icon: <CheckCircle2 size={20} />,color: '#36B37E', bg: '#E3FCEF' },
+    { label: 'Assigned Work',  value: stats.totalModules || 0,    icon: <Layers size={22} />,      color: 'var(--primary)', bg: 'var(--primary-xlight)' },
+    { label: 'To-Do Items',    value: stats.pendingModules || 0,  icon: <Clock size={22} />,       color: 'var(--warning)', bg: 'var(--warning-xlight)' },
+    { label: 'Under Review',   value: stats.submittedModules || 0,icon: <Briefcase size={22} />,   color: 'var(--accent)', bg: 'var(--accent-xlight)' },
+    { label: 'Milestones',     value: stats.completedModules || 0,icon: <CheckCircle2 size={22} />,color: 'var(--success)', bg: 'var(--success-xlight)' },
   ];
 
   const activeModules = myModules.filter(m => m.status !== 'completed');
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade">
       <div className="page-header">
-        <div>
-          <h1 className="page-title">Developer Dashboard</h1>
-          <p className="page-subtitle">Track your assignments and overall progress.</p>
+        <div className="header-content">
+          <h1 className="page-title">Developer Hub</h1>
+          <p className="page-subtitle">Welcome back, {currentUser?.name}. Focus on your top {activeModules.length} priorities today.</p>
         </div>
-        <div style={{ fontSize: '0.875rem', color: '#6B778C', background: '#fff', border: '1px solid #DFE1E6', borderRadius: '20px', padding: '0.375rem 1rem', fontWeight: '500' }}>
-          👋 Welcome back, <strong style={{ color: '#172B4D' }}>{currentUser?.name}</strong>
+        <div className="header-actions">
+          <button className="btn btn-ghost btn-pill"><Filter size={18} /> View Logs</button>
+          <button className="btn btn-primary btn-pill"><Send size={18} /> Submit Module</button>
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.25rem', marginBottom: '1.5rem' }} className="dev-stats-grid">
+      {/* Stat Cards Grid */}
+      <div className="dashboard-grid grid-4 mb-xl">
         {statCards.map((card, i) => (
-          <div key={i} style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.375rem', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)', borderTop: `3px solid ${card.color}`, transition: 'all 0.2s' }} className="stat-card-hover">
-            <div style={{ width: '46px', height: '46px', borderRadius: '10px', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              {card.icon}
+          <div key={i} className="glass-card stat-card stagger-1" style={{ '--delay': `${i * 0.1}s` }}>
+            <div className="stat-card-header">
+              <div className="stat-icon-wrapper" style={{ background: card.bg, color: card.color }}>
+                {card.icon}
+              </div>
             </div>
-            <div>
-              <div style={{ fontSize: '1.75rem', fontWeight: '800', color: '#172B4D', lineHeight: 1.1, fontFamily: "'Outfit', sans-serif" }}>{card.value}</div>
-              <div style={{ fontSize: '0.775rem', color: '#6B778C', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{card.label}</div>
+            <div className="stat-card-body">
+              <h3 className="stat-value">{card.value}</h3>
+              <p className="stat-label">{card.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.25rem' }} className="dev-chart-grid">
-        {/* Bar Chart */}
-        <div style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#172B4D', marginBottom: '1.5rem' }}>Task Distribution</h3>
-          {stats.totalModules > 0 ? (
-            <div style={{ width: '100%', height: '260px' }}>
+      {/* Main Content Grid */}
+      <div className="dashboard-grid grid-2-1">
+        {/* Task Distribution Bar */}
+        <div className="glass-card chart-container">
+          <div className="card-header">
+            <div className="card-header-title">
+              <h3>Sprint Distribution</h3>
+              <p>Module breakdown by status</p>
+            </div>
+            <button className="btn-icon-sm"><BarChart3 size={16} /></button>
+          </div>
+          <div className="chart-wrapper" style={{ height: 320 }}>
+            {stats.totalModules > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} barSize={48}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F4F5F7" vertical={false} />
-                  <XAxis dataKey="name" stroke="#8993A4" fontSize={12} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#8993A4" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="name" stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="var(--text-muted)" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
-                    cursor={{ fill: 'rgba(9,30,66,0.04)' }}
-                    contentStyle={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '6px', boxShadow: '0 4px 12px rgba(9,30,66,0.1)', fontSize: '12px' }}
-                    itemStyle={{ color: '#172B4D' }}
+                    cursor={{ fill: 'rgba(0, 0, 0, 0.02)' }}
+                    contentStyle={{ 
+                      background: 'rgba(255, 255, 255, 0.9)', 
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '12px',
+                      boxShadow: 'var(--shadow-lg)'
+                    }} 
                   />
-                  <Bar dataKey="count" radius={[5, 5, 0, 0]}>
+                  <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                     {chartData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            </div>
-          ) : (
-            <div className="empty-state" style={{ height: '260px' }}>
-              <AlertCircle style={{ width: '2rem', height: '2rem', opacity: 0.3, color: '#6B778C', marginBottom: '0.75rem' }} />
-              <p className="empty-state-text">No data to display</p>
-            </div>
-          )}
+            ) : (
+              <div className="table-empty-state" style={{ height: '100%' }}>
+                <div className="empty-icon"><AlertCircle size={40} /></div>
+                <p>No active module data</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Current Focus */}
-        <div style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', padding: '1.5rem', boxShadow: '0 1px 4px rgba(9,30,66,0.06)' }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', color: '#172B4D', marginBottom: '1.25rem' }}>Current Focus</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-            {activeModules.slice(0, 4).map(mod => (
-              <div key={mod._id} style={{
-                padding: '0.875rem 1rem', borderRadius: '8px',
-                background: mod.status === 'rejected' ? '#FFF5F5' : '#F8F9FC',
-                border: `1px solid ${mod.status === 'rejected' ? '#FFBDAD' : '#EBECF0'}`,
-                transition: 'all 0.2s',
-              }} className="focus-item">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: '700', color: '#172B4D', flex: 1, marginRight: '0.5rem' }}>{mod.name}</span>
-                  <span className={`badge badge-${mod.status}`} style={{ fontSize: '0.65rem', flexShrink: 0 }}>{mod.status}</span>
+        {/* Current Focus List */}
+        <div className="glass-card focus-container">
+          <div className="card-header">
+            <div className="card-header-title">
+              <h3>Immediate Focus</h3>
+              <p>Critical tasks requiring action</p>
+            </div>
+          </div>
+          <div className="focus-list">
+            {activeModules.length > 0 ? (
+              activeModules.slice(0, 4).map(mod => (
+                <div key={mod._id} className={`focus-item-premium ${mod.status === 'rejected' ? 'rejected' : ''}`}>
+                  <div className="focus-header">
+                    <span className="focus-name">{mod.name}</span>
+                    <span className={`badge badge-${mod.status} badge-pill`}>{mod.status}</span>
+                  </div>
+                  <div className="focus-footer">
+                    <div className="focus-meta">
+                      <Calendar size={14} />
+                      <span>{mod.deadline ? new Date(mod.deadline).toLocaleDateString() : 'No deadline'}</span>
+                    </div>
+                    <button className="btn-icon-xs"><ChevronRight size={14} /></button>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.75rem', color: '#6B778C' }}>
-                  <Clock size={11} /> Due: {mod.deadline ? new Date(mod.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A'}
-                </div>
-              </div>
-            ))}
-            {activeModules.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '2rem' }}>
-                <CheckCircle2 size={32} style={{ color: '#36B37E', opacity: 0.5, margin: '0 auto 0.75rem', display: 'block' }} />
-                <p style={{ fontSize: '0.875rem', color: '#6B778C', fontWeight: '600' }}>All caught up! 🎉</p>
+              ))
+            ) : (
+              <div className="all-clear glass">
+                <CheckCircle2 size={40} className="success-icon" />
+                <h4>Workspace Cleared</h4>
+                <p>All modules are completed or verified.</p>
               </div>
             )}
           </div>
@@ -117,14 +144,48 @@ const DevDashboard = () => {
       </div>
 
       <style>{`
-        .stat-card-hover:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(9,30,66,0.1) !important; }
-        .focus-item:hover { border-color: #B3D4FF !important; background: #FAFBFF !important; }
-        @media (max-width: 960px) {
-          .dev-stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .dev-chart-grid { grid-template-columns: 1fr !important; }
+        .mb-xl { margin-bottom: 2rem; }
+        .dashboard-grid { display: grid; gap: 1.5rem; }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        .grid-2-1 { grid-template-columns: 2fr 1fr; }
+
+        .stat-card { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+        .stat-card-header { display: flex; align-items: center; justify-content: space-between; }
+        .stat-icon-wrapper { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.25rem; letter-spacing: -0.02em; }
+        .stat-label { font-size: 0.875rem; color: var(--text-muted); font-weight: 600; }
+
+        .chart-container { padding: 1.5rem; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; }
+        .card-header-title h3 { font-size: 1.125rem; font-weight: 800; margin-bottom: 0.25rem; }
+        .card-header-title p { font-size: 0.875rem; color: var(--text-muted); }
+
+        .focus-container { padding: 1.5rem; }
+        .focus-list { display: flex; flex-direction: column; gap: 1rem; }
+        .focus-item-premium { padding: 1rem; background: #FAFBFC; border: 1px solid var(--border); border-radius: var(--radius-md); transition: var(--transition-base); }
+        .focus-item-premium:hover { border-color: var(--primary-light); transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .focus-item-premium.rejected { border-left: 4px solid var(--danger); background: #FFF5F5; }
+        
+        .focus-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .focus-name { font-weight: 700; color: var(--text-primary); font-size: 0.9375rem; }
+        
+        .focus-footer { display: flex; justify-content: space-between; align-items: center; }
+        .focus-meta { display: flex; align-items: center; gap: 0.5rem; font-size: 0.75rem; color: var(--text-muted); }
+        
+        .all-clear { padding: 2.5rem 1.5rem; text-align: center; border-radius: var(--radius-lg); }
+        .success-icon { color: var(--success); margin: 0 auto 1rem; opacity: 0.8; }
+        .all-clear h4 { font-size: 1rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .all-clear p { font-size: 0.8125rem; color: var(--text-muted); }
+
+        .btn-icon-xs { width: 24px; height: 24px; border-radius: 6px; background: white; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; }
+
+        @media (max-width: 1200px) {
+          .grid-4 { grid-template-columns: repeat(2, 1fr); }
+          .grid-2-1 { grid-template-columns: 1fr; }
         }
+
         @media (max-width: 640px) {
-          .dev-stats-grid { grid-template-columns: 1fr 1fr !important; }
+          .grid-4 { grid-template-columns: 1fr; }
         }
       `}</style>
     </div>

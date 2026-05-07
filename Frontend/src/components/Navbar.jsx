@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   Bell, Search, ChevronDown, Settings, HelpCircle,
-  User, LogOut, ExternalLink, X
+  User, LogOut, ExternalLink, X, Plus
 } from 'lucide-react';
 
 const Navbar = () => {
@@ -27,179 +27,105 @@ const Navbar = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   const roleLabel = {
-    admin: 'Administrator',
-    teamleader: 'Team Leader',
-    developer: 'Developer',
+    admin: 'Platform Admin',
+    teamleader: 'Team Lead',
+    developer: 'Senior Developer',
   }[currentUser?.role] || currentUser?.role;
 
   const avatarColors = {
-    admin:      { bg: '#0052CC', text: 'white' },
-    teamleader: { bg: '#36B37E', text: 'white' },
-    developer:  { bg: '#6554C0', text: 'white' },
+    admin:      { bg: 'var(--primary)', text: 'white' },
+    teamleader: { bg: 'var(--success)', text: 'white' },
+    developer:  { bg: 'var(--accent)', text: 'white' },
   };
-  const av = avatarColors[currentUser?.role] || { bg: '#0052CC', text: 'white' };
+  const av = avatarColors[currentUser?.role] || { bg: 'var(--primary)', text: 'white' };
 
   return (
-    <header style={{
-      height: 'var(--navbar-height)',
-      position: 'fixed',
-      top: 0, right: 0,
-      left: 'var(--sidebar-width)',
-      background: 'rgba(255,255,255,0.97)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid #DFE1E6',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0 1.5rem',
-      zIndex: 90,
-      boxShadow: '0 1px 4px rgba(9,30,66,0.06)',
-    }}>
-
-      {/* Left – Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
-        <div className="search-wrapper" style={{ position: 'relative', width: '260px' }}>
-          <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#8993A4', pointerEvents: 'none' }} />
+    <header className="navbar glass">
+      {/* Left: Breadcrumbs & Actions */}
+      <div className="navbar-left">
+        <button className="btn btn-primary btn-pill btn-sm">
+          <Plus size={16} /> Create
+        </button>
+        <div className="navbar-divider"></div>
+        <div className="navbar-search-box">
+          <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search AXIS…"
+            placeholder="Search tasks, docs..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.45rem 0.875rem 0.45rem 2.25rem',
-              background: '#F4F5F7',
-              border: '1px solid #DFE1E6',
-              borderRadius: '6px',
-              color: '#172B4D',
-              fontSize: '0.85rem',
-              outline: 'none',
-              transition: 'all 0.2s',
-              fontFamily: 'Inter, sans-serif',
-            }}
-            className="navbar-search"
           />
+          <kbd className="search-kbd">/</kbd>
         </div>
       </div>
 
-      {/* Right – Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+      {/* Right: Tools & Profile */}
+      <div className="navbar-right">
+        <div className="navbar-tools">
+          <button className="nav-tool-btn" title="Help"><HelpCircle size={18} /></button>
+          <button className="nav-tool-btn" title="Settings"><Settings size={18} /></button>
+          
+          <div className="navbar-notif-wrapper" ref={notifRef}>
+            <button
+              onClick={() => { setShowNotifications(!showNotifications); setShowProfileMenu(false); }}
+              className={`nav-tool-btn ${showNotifications ? 'active' : ''}`}
+              title="Notifications"
+            >
+              <Bell size={18} />
+              <span className="notif-dot"></span>
+            </button>
 
-        {/* Utility Buttons */}
-        <button className="nav-icon-btn" title="Help"><HelpCircle size={17} /></button>
-        <button className="nav-icon-btn" title="Settings"><Settings size={17} /></button>
-
-        <div style={{ width: '1px', height: '22px', background: '#DFE1E6', margin: '0 0.375rem' }} />
-
-        {/* Notifications */}
-        <div style={{ position: 'relative' }} ref={notifRef}>
-          <button
-            onClick={() => { setShowNotifications(!showNotifications); setShowProfileMenu(false); }}
-            className="nav-icon-btn"
-            style={{ position: 'relative' }}
-            title="Notifications"
-          >
-            <Bell size={17} />
-          </button>
-
-          {showNotifications && (
-            <div className="animate-slide-down" style={{
-              position: 'absolute', top: '48px', right: 0,
-              width: '300px', background: '#fff',
-              border: '1px solid #DFE1E6', borderRadius: '8px',
-              boxShadow: '0 8px 24px rgba(9,30,66,0.15)',
-              zIndex: 1000,
-            }}>
-              <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #F4F5F7', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h4 style={{ fontSize: '0.875rem', fontWeight: '700', color: '#172B4D' }}>Notifications</h4>
-                <button onClick={() => setShowNotifications(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B778C', display: 'flex' }}>
-                  <X size={16} />
-                </button>
+            {showNotifications && (
+              <div className="dropdown-menu notif-dropdown animate-up">
+                <div className="dropdown-header">
+                  <h4>Notifications</h4>
+                  <button className="btn-close" onClick={() => setShowNotifications(false)}><X size={16} /></button>
+                </div>
+                <div className="dropdown-body empty">
+                  <div className="empty-state-icon"><Bell size={32} /></div>
+                  <p>All clear! No new notifications.</p>
+                </div>
               </div>
-              <div style={{ padding: '2rem 1.25rem', textAlign: 'center', color: '#8993A4', fontSize: '0.8rem' }}>
-                <Bell size={24} style={{ opacity: 0.3, marginBottom: '0.5rem', display: 'block', margin: '0 auto 0.5rem' }} />
-                You're all caught up!
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Profile */}
-        <div style={{ position: 'relative' }} ref={profileRef}>
+        <div className="navbar-profile-wrapper" ref={profileRef}>
           <button
             onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '0.5rem',
-              padding: '0.3rem 0.625rem 0.3rem 0.375rem',
-              background: showProfileMenu ? '#DEEBFF' : '#F4F5F7',
-              border: '1px solid',
-              borderColor: showProfileMenu ? '#B3D4FF' : '#DFE1E6',
-              borderRadius: '20px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-            className="profile-trigger"
+            className={`profile-trigger ${showProfileMenu ? 'active' : ''}`}
           >
-            <div style={{
-              width: '28px', height: '28px', borderRadius: '50%',
-              background: av.bg, color: av.text,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.7rem', fontWeight: '800',
-            }}>
+            <div className="avatar" style={{ background: av.bg }}>
               {currentUser?.name?.charAt(0)?.toUpperCase()}
             </div>
-            <span style={{ fontSize: '0.825rem', fontWeight: '600', color: '#172B4D', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {currentUser?.name}
-            </span>
-            <ChevronDown size={13} style={{ color: '#6B778C', transform: showProfileMenu ? 'rotate(180deg)' : 'rotate(0)', transition: 'transform 0.2s' }} />
+            <div className="profile-info">
+              <span className="profile-name">{currentUser?.name}</span>
+              <span className="profile-role">{roleLabel}</span>
+            </div>
+            <ChevronDown size={14} className={`chevron ${showProfileMenu ? 'rotated' : ''}`} />
           </button>
 
           {showProfileMenu && (
-            <div className="animate-slide-down" style={{
-              position: 'absolute', top: '48px', right: 0,
-              width: '256px', background: '#fff',
-              border: '1px solid #DFE1E6', borderRadius: '10px',
-              boxShadow: '0 8px 24px rgba(9,30,66,0.15)',
-              zIndex: 1000, overflow: 'hidden',
-            }}>
-              {/* Header */}
-              <div style={{ padding: '1.125rem 1.25rem', background: '#F8F9FC', borderBottom: '1px solid #EBECF0', display: 'flex', alignItems: 'center', gap: '0.875rem' }}>
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: '50%',
-                  background: av.bg, color: av.text,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '1.1rem', fontWeight: '800', flexShrink: 0,
-                }}>
+            <div className="dropdown-menu profile-dropdown animate-up">
+              <div className="dropdown-profile-header">
+                <div className="avatar avatar-lg" style={{ background: av.bg }}>
                   {currentUser?.name?.charAt(0)?.toUpperCase()}
                 </div>
-                <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: '0.875rem', fontWeight: '700', color: '#172B4D', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser?.name}</p>
-                  <p style={{ fontSize: '0.75rem', color: '#6B778C', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{roleLabel}</p>
+                <div>
+                  <h4 className="profile-name-lg">{currentUser?.name}</h4>
+                  <p className="profile-email">{currentUser?.email || 'user@axis.systems'}</p>
                 </div>
               </div>
-
-              {/* Menu Items */}
-              <div style={{ padding: '0.5rem' }}>
-                <button className="profile-menu-item">
-                  <User size={16} /><span>Profile</span>
-                </button>
-                <button className="profile-menu-item">
-                  <Settings size={16} /><span>Account settings</span>
-                </button>
-                <button className="profile-menu-item">
-                  <ExternalLink size={16} /><span>Documentation</span>
-                </button>
+              <div className="dropdown-divider"></div>
+              <div className="dropdown-items">
+                <button className="dropdown-item"><User size={16} /> My Profile</button>
+                <button className="dropdown-item"><Settings size={16} /> Preferences</button>
+                <button className="dropdown-item"><ExternalLink size={16} /> Support Center</button>
               </div>
-
-              <div style={{ height: '1px', background: '#EBECF0', margin: '0 0.5rem' }} />
-
-              <div style={{ padding: '0.5rem' }}>
-                <button
-                  className="profile-menu-item"
-                  onClick={handleLogout}
-                  style={{ color: '#DE350B' }}
-                >
-                  <LogOut size={16} /><span>Log out</span>
+              <div className="dropdown-divider"></div>
+              <div className="dropdown-items">
+                <button className="dropdown-item text-danger" onClick={handleLogout}>
+                  <LogOut size={16} /> Sign Out
                 </button>
               </div>
             </div>
@@ -208,42 +134,242 @@ const Navbar = () => {
       </div>
 
       <style>{`
-        .nav-icon-btn {
-          background: none; border: none;
-          color: #42526E; cursor: pointer;
-          width: 34px; height: 34px;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: 6px;
-          transition: all 0.15s;
+        .navbar {
+          height: var(--navbar-height);
+          position: fixed;
+          top: 0; right: 0;
+          left: var(--sidebar-width);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 2rem;
+          z-index: 90;
+          transition: var(--transition-base);
         }
-        .nav-icon-btn:hover {
-          background: #F4F5F7;
-          color: #172B4D;
+
+        .navbar-left {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          flex: 1;
         }
-        .navbar-search:focus {
-          background: #fff !important;
-          border-color: #0052CC !important;
-          box-shadow: 0 0 0 3px rgba(0,82,204,0.12) !important;
-          width: 320px !important;
+
+        .navbar-divider {
+          width: 1px;
+          height: 24px;
+          background: var(--border);
         }
-        .profile-trigger:hover {
-          background: #DEEBFF !important;
-          border-color: #B3D4FF !important;
+
+        .navbar-search-box {
+          position: relative;
+          width: 320px;
+          display: flex;
+          align-items: center;
         }
-        .profile-menu-item {
-          width: 100%; display: flex; align-items: center; gap: 0.625rem;
-          padding: 0.6rem 0.875rem;
-          background: none; border: none; border-radius: 6px;
-          color: #42526E; font-size: 0.8125rem; font-weight: 500;
-          cursor: pointer; text-align: left;
-          transition: all 0.15s;
+
+        .navbar-search-box .search-icon {
+          position: absolute;
+          left: 1rem;
+          color: var(--text-placeholder);
         }
-        .profile-menu-item:hover {
-          background: #F4F5F7;
-          color: #172B4D;
+
+        .navbar-search-box input {
+          width: 100%;
+          padding: 0.625rem 3rem 0.625rem 2.75rem;
+          background: rgba(0, 0, 0, 0.03);
+          border: 1px solid transparent;
+          border-radius: var(--radius-sm);
+          font-size: 0.875rem;
+          color: var(--text-primary);
+          transition: var(--transition-base);
         }
+
+        .navbar-search-box input:focus {
+          background: white;
+          border-color: var(--primary);
+          box-shadow: var(--shadow-sm);
+          width: 400px;
+        }
+
+        .search-kbd {
+          position: absolute;
+          right: 0.75rem;
+          padding: 0.125rem 0.375rem;
+          background: white;
+          border: 1px solid var(--border);
+          border-radius: 4px;
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          font-weight: 700;
+        }
+
+        .navbar-right {
+          display: flex;
+          align-items: center;
+          gap: 2rem;
+        }
+
+        .navbar-tools {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .nav-tool-btn {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: none;
+          background: transparent;
+          color: var(--text-secondary);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: var(--transition-base);
+          position: relative;
+        }
+
+        .nav-tool-btn:hover, .nav-tool-btn.active {
+          background: var(--primary-xlight);
+          color: var(--primary);
+        }
+
+        .notif-dot {
+          position: absolute;
+          top: 8px; right: 8px;
+          width: 8px; height: 8px;
+          background: var(--danger);
+          border: 2px solid white;
+          border-radius: 50%;
+        }
+
+        /* Dropdowns */
+        .dropdown-menu {
+          position: absolute;
+          top: calc(100% + 12px);
+          right: 0;
+          width: 320px;
+          background: white;
+          border-radius: var(--radius-lg);
+          box-shadow: var(--shadow-xl);
+          border: 1px solid var(--border);
+          overflow: hidden;
+        }
+
+        .dropdown-header {
+          padding: 1.25rem 1.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid var(--border);
+        }
+
+        .dropdown-header h4 { font-size: 1rem; font-weight: 800; }
+        .btn-close { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+
+        .dropdown-body.empty {
+          padding: 3rem 1.5rem;
+          text-align: center;
+          color: var(--text-muted);
+        }
+
+        .dropdown-body.empty .empty-state-icon {
+          margin-bottom: 1rem;
+          opacity: 0.2;
+        }
+
+        /* Profile Trigger */
+        .profile-trigger {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.375rem;
+          padding-right: 1rem;
+          border-radius: var(--radius-full);
+          border: 1px solid var(--border);
+          background: #FAFBFC;
+          cursor: pointer;
+          transition: var(--transition-base);
+        }
+
+        .profile-trigger:hover, .profile-trigger.active {
+          border-color: var(--primary-light);
+          background: white;
+          box-shadow: var(--shadow-sm);
+        }
+
+        .avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 800;
+          font-size: 0.8125rem;
+        }
+
+        .avatar-lg { width: 48px; height: 48px; font-size: 1.25rem; }
+
+        .profile-info {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+          line-height: 1.2;
+        }
+
+        .profile-name { font-size: 0.875rem; font-weight: 700; color: var(--text-primary); }
+        .profile-role { font-size: 0.75rem; color: var(--text-muted); }
+
+        .chevron { color: var(--text-muted); transition: var(--transition-base); }
+        .chevron.rotated { transform: rotate(180deg); }
+
+        /* Profile Dropdown */
+        .profile-dropdown { width: 280px; }
+        .dropdown-profile-header {
+          padding: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          background: #FAFBFC;
+        }
+
+        .profile-name-lg { font-size: 1rem; font-weight: 800; }
+        .profile-email { font-size: 0.8125rem; color: var(--text-muted); }
+
+        .dropdown-divider { height: 1px; background: var(--border); }
+        .dropdown-items { padding: 0.5rem; }
+        
+        .dropdown-item {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem 1rem;
+          border: none;
+          background: transparent;
+          border-radius: var(--radius-sm);
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--text-secondary);
+          cursor: pointer;
+          transition: var(--transition-fast);
+        }
+
+        .dropdown-item:hover {
+          background: var(--bg-card-hover);
+          color: var(--text-primary);
+        }
+
+        .dropdown-item.text-danger { color: var(--danger); }
+        .dropdown-item.text-danger:hover { background: var(--danger-bg); }
+
         @media (max-width: 768px) {
-          header { left: 0 !important; padding-left: 3.5rem !important; }
+          .navbar { left: 0; padding: 0 1rem; }
+          .navbar-search-box { display: none; }
+          .profile-info { display: none; }
         }
       `}</style>
     </header>
