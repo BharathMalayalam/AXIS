@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Plus, Layers, Calendar, X, User } from 'lucide-react';
+import { Plus, Layers, Calendar, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 const TLModules = () => {
@@ -29,7 +29,6 @@ const TLModules = () => {
     if (typeof mod.assignedDev === 'object') return mod.assignedDev.name;
     return myTeam.find(d => d._id === mod.assignedDev)?.name || 'Unassigned';
   };
-
   const getProjectName = (mod) => {
     if (!mod.projectId) return 'Unknown';
     if (typeof mod.projectId === 'object') return mod.projectId.name;
@@ -43,88 +42,78 @@ const TLModules = () => {
           <h1 className="page-title">Module Allocation</h1>
           <p className="page-subtitle">Divide projects into modules and distribute tasks among developers.</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn btn-primary" disabled={myProjects.length === 0}>
-          <Plus size={16} /> Assign New Module
-        </button>
-      </div>
-
-      {/* Table */}
-      <div style={{ background: '#fff', border: '1px solid #DFE1E6', borderRadius: '10px', boxShadow: '0 1px 4px rgba(9,30,66,0.06)', overflow: 'hidden' }}>
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th style={{ paddingLeft: '1.5rem' }}>Module Name</th>
-                <th>Project</th>
-                <th>Developer</th>
-                <th>Deadline</th>
-                <th style={{ paddingRight: '1.5rem' }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {myModules.length === 0 ? (
-                <tr><td colSpan="5">
-                  <div className="empty-state">
-                    <Layers style={{ width: '2.5rem', height: '2.5rem', opacity: 0.3, color: '#6B778C', marginBottom: '0.75rem' }} />
-                    <p className="empty-state-text">No Modules Assigned Yet</p>
-                    <p className="empty-state-sub">Select a project and assign modules to your team.</p>
-                  </div>
-                </td></tr>
-              ) : (
-                myModules.map(mod => (
-                  <tr key={mod._id}>
-                    <td style={{ paddingLeft: '1.5rem' }}>
-                      <div>
-                        <div style={{ fontWeight: '700', color: '#172B4D', fontSize: '0.875rem' }}>{mod.name}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#6B778C', marginTop: '2px', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {mod.description?.substring(0, 50)}{mod.description?.length > 50 ? '…' : ''}
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: '700', color: '#0052CC', background: '#DEEBFF', padding: '2px 8px', borderRadius: '4px' }}>
-                        {getProjectName(mod)}
-                      </span>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: '#6554C0', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.65rem', fontWeight: '800', flexShrink: 0 }}>
-                          {getDevName(mod)[0]?.toUpperCase()}
-                        </div>
-                        <span style={{ fontSize: '0.875rem', color: '#42526E' }}>{getDevName(mod)}</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8125rem', color: '#42526E' }}>
-                        <Calendar size={12} style={{ color: '#8993A4' }} />
-                        {mod.deadline ? new Date(mod.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
-                      </div>
-                    </td>
-                    <td style={{ paddingRight: '1.5rem' }}>
-                      <span className={`badge badge-${mod.status}`}>{mod.status?.replace('_', ' ')}</span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="header-actions">
+          <button onClick={() => setShowModal(true)} className="btn btn-primary btn-pill" disabled={myProjects.length === 0}>
+            <Plus size={16} /> Assign New Module
+          </button>
         </div>
       </div>
 
-      {/* Assign Module Modal */}
+      <div className="table-container">
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Module Name</th>
+              <th>Project</th>
+              <th>Developer</th>
+              <th>Deadline</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {myModules.length === 0 ? (
+              <tr><td colSpan="5">
+                <div className="empty-state">
+                  <div className="empty-state-icon"><Layers size={28} /></div>
+                  <p className="empty-state-title">No Modules Assigned Yet</p>
+                  <p className="empty-state-text">Select a project and assign modules to your team.</p>
+                </div>
+              </td></tr>
+            ) : myModules.map(mod => (
+              <tr key={mod._id}>
+                <td>
+                  <div>
+                    <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: '.875rem' }}>{mod.name}</div>
+                    <div className="text-xs text-muted truncate" style={{ maxWidth: 200 }}>
+                      {mod.description?.substring(0, 50)}{mod.description?.length > 50 ? '…' : ''}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span className="badge badge-progress">{getProjectName(mod)}</span>
+                </td>
+                <td>
+                  <div className="user-pill">
+                    <div className="avatar avatar-xs avatar-accent">{getDevName(mod)[0]?.toUpperCase()}</div>
+                    <span className="text-sm">{getDevName(mod)}</span>
+                  </div>
+                </td>
+                <td>
+                  <div className="flex items-center gap-1 text-sm">
+                    <Calendar size={12} style={{ color: 'var(--text-muted)' }} />
+                    {mod.deadline ? new Date(mod.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—'}
+                  </div>
+                </td>
+                <td><span className={`badge badge-${mod.status}`}>{mod.status?.replace('_', ' ')}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal animate-scale-in">
+          <div className="modal">
             <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <div style={{ width: '36px', height: '36px', background: '#DEEBFF', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0052CC' }}>
-                  <Layers size={18} />
+              <div className="flex items-center gap-2">
+                <div className="modal-icon" style={{ background: 'var(--primary-xlight)', color: 'var(--primary)' }}>
+                  <Layers size={20} />
                 </div>
                 <h2 className="modal-title">New Module Assignment</h2>
               </div>
               <button onClick={() => setShowModal(false)} className="modal-close"><X size={16} /></button>
             </div>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>
+            <form onSubmit={handleSubmit} className="modal-form">
               <div className="form-group">
                 <label className="form-label">Select Project *</label>
                 <select className="form-select" required value={formData.projectId}
@@ -153,12 +142,12 @@ const TLModules = () => {
                   </select>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Completion Deadline *</label>
+                  <label className="form-label">Deadline *</label>
                   <input type="date" className="form-input" required
                     value={formData.deadline} onChange={e => setFormData({ ...formData, deadline: e.target.value })} />
                 </div>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '0.5rem' }}>
+              <div className="modal-footer">
                 <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost">Cancel</button>
                 <button type="submit" className="btn btn-primary">Assign Module</button>
               </div>
@@ -169,5 +158,4 @@ const TLModules = () => {
     </div>
   );
 };
-
 export default TLModules;

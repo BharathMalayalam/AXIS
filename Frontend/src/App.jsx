@@ -45,8 +45,8 @@ export default function App() {
 
   const defaultPath = currentUser
     ? currentUser.role?.toLowerCase() === 'admin' ? '/admin'
-    : currentUser.role?.toLowerCase() === 'teamleader' ? '/tl'
-    : '/dev'
+      : currentUser.role?.toLowerCase() === 'teamleader' ? '/tl'
+        : '/dev'
     : '/';
 
   return (

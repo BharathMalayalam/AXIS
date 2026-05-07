@@ -36,8 +36,8 @@ const HomePage = () => {
 
   const dashboardPath = currentUser
     ? currentUser.role?.toLowerCase() === 'admin' ? '/admin'
-    : currentUser.role?.toLowerCase() === 'teamleader' ? '/tl'
-    : '/dev'
+      : currentUser.role?.toLowerCase() === 'teamleader' ? '/tl'
+        : '/dev'
     : '/login';
 
   return (
@@ -82,11 +82,11 @@ const HomePage = () => {
               <Star size={14} fill="currentColor" />
               <span>Next-Gen Project Management</span>
             </div>
-            
+
             <h1 className="hp-hero-title animate-up stagger-2">
               Accelerate your team's <span className="text-gradient">velocity</span> with AXIS
             </h1>
-            
+
             <p className="hp-hero-subtitle animate-up stagger-3">
               The premium agile platform that scales with your ambition. Plan intuitively, track precisely, and release software that matters.
             </p>

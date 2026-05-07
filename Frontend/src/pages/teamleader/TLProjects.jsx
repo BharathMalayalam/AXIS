@@ -1,11 +1,10 @@
 import { useApp } from '../../context/AppContext';
-import { Briefcase, Calendar, ChevronRight, Layers, Clock, CheckCircle2 } from 'lucide-react';
+import { Briefcase, Calendar, ChevronRight, Layers, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const TLProjects = () => {
   const { currentUser, projects, modules } = useApp();
   const navigate = useNavigate();
-
   const myProjects = projects.filter(p => (p.assignedTL?._id || p.assignedTL) === currentUser?._id);
 
   return (
@@ -15,91 +14,68 @@ const TLProjects = () => {
           <h1 className="page-title">Assigned Projects</h1>
           <p className="page-subtitle">View and manage projects received from Admin.</p>
         </div>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '0.5rem',
-          padding: '0.5rem 1rem',
-          background: '#DEEBFF', border: '1px solid #B3D4FF',
-          borderRadius: '20px', fontSize: '0.8125rem', fontWeight: '700', color: '#0052CC',
-        }}>
-          <Briefcase size={14} />
-          {myProjects.length} {myProjects.length === 1 ? 'Project' : 'Projects'}
+        <div className="header-actions">
+          <span className="status-pill" style={{ background: 'var(--primary-xlight)', color: 'var(--primary)', border: '1px solid #B3D4FF' }}>
+            <Briefcase size={14} />
+            {myProjects.length} {myProjects.length === 1 ? 'Project' : 'Projects'}
+          </span>
         </div>
       </div>
 
       {myProjects.length === 0 ? (
-        <div style={{
-          background: '#fff', border: '1px solid #DFE1E6', borderRadius: '12px',
-          padding: '5rem 2rem', textAlign: 'center',
-          boxShadow: '0 1px 4px rgba(9,30,66,0.06)',
-        }}>
-          <div style={{ width: '64px', height: '64px', background: '#DEEBFF', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: '#0052CC' }}>
-            <Briefcase size={32} />
+        <div className="glass-card">
+          <div className="empty-state">
+            <div className="empty-state-icon"><Briefcase size={28} /></div>
+            <p className="empty-state-title">No Projects Assigned Yet</p>
+            <p className="empty-state-text">Waiting for Admin to assign new projects to your queue.</p>
           </div>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: '700', color: '#172B4D', marginBottom: '0.5rem' }}>No Projects Assigned Yet</h3>
-          <p style={{ color: '#6B778C', fontSize: '0.9rem' }}>Waiting for Admin to assign new projects to your queue.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.25rem' }}>
           {myProjects.map(proj => {
             const projModules    = modules.filter(m => (m.projectId?._id || m.projectId) === proj._id);
             const completedCount = projModules.filter(m => m.status === 'completed').length;
             const progress       = projModules.length > 0 ? Math.round((completedCount / projModules.length) * 100) : 0;
-            const progressColor  = progress >= 80 ? '#36B37E' : progress >= 40 ? '#0052CC' : '#FFAB00';
+            const progressColor  = progress >= 80 ? 'var(--success)' : progress >= 40 ? 'var(--primary)' : 'var(--warning)';
             const isOverdue      = proj.deadline && new Date(proj.deadline) < new Date() && proj.status !== 'completed';
 
             return (
-              <div key={proj._id} style={{
-                background: '#fff', border: '1px solid #DFE1E6', borderRadius: '12px',
-                boxShadow: '0 1px 4px rgba(9,30,66,0.06)', overflow: 'hidden',
-                display: 'flex', flexDirection: 'column', transition: 'all 0.2s',
-              }} className="project-card">
-                {/* Card Top Color Bar */}
-                <div style={{ height: '4px', background: progressColor }} />
-
-                <div style={{ padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Header */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <div key={proj._id} className="glass-card" style={{ overflow: 'hidden', display: 'flex', flexDirection: 'column', borderTop: `3px solid ${progressColor}` }}>
+                <div style={{ padding: '1.375rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  <div className="flex justify-between items-center" style={{ marginBottom: '1rem' }}>
                     <span className={`badge badge-${proj.status}`}>{(proj.status || '').replace('_', ' ')}</span>
-                    {isOverdue && (
-                      <span style={{ background: '#FFEBE6', color: '#BF2600', border: '1px solid #FFBDAD', borderRadius: '20px', padding: '2px 8px', fontSize: '0.7rem', fontWeight: '700' }}>
-                        Overdue
-                      </span>
-                    )}
+                    {isOverdue && <span className="badge badge-rejected">Overdue</span>}
                   </div>
 
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: '800', color: '#172B4D', marginBottom: '0.5rem', lineHeight: 1.3 }}>
-                    {proj.name}
-                  </h3>
-                  <p style={{ fontSize: '0.875rem', color: '#6B778C', lineHeight: 1.6, flex: 1, marginBottom: '1.25rem' }}>
+                  <h3 style={{ fontSize: '1.0625rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '.5rem', lineHeight: 1.3 }}>{proj.name}</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)', lineHeight: 1.6, flex: 1, marginBottom: '1.25rem' }}>
                     {proj.description || 'No description provided for this project.'}
                   </p>
 
-                  {/* Deadline */}
                   {proj.deadline && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: isOverdue ? '#BF2600' : '#6B778C', marginBottom: '1.25rem', fontWeight: '600' }}>
+                    <div className="flex items-center gap-1 text-sm" style={{ color: isOverdue ? 'var(--danger)' : 'var(--text-muted)', marginBottom: '1.25rem', fontWeight: 600 }}>
                       <Clock size={13} />
                       Due: {new Date(proj.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                   )}
 
                   {/* Progress */}
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem', fontSize: '0.8rem', color: '#42526E', fontWeight: '600' }}>
+                  <div style={{ marginBottom: '1.25rem' }}>
+                    <div className="flex justify-between items-center" style={{ marginBottom: '.5rem' }}>
+                      <div className="flex items-center gap-1 text-sm" style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>
                         <Layers size={13} /> {projModules.length} Modules
                       </div>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: progressColor }}>{progress}%</span>
+                      <span className="text-sm" style={{ fontWeight: 800, color: progressColor }}>{progress}%</span>
                     </div>
-                    <div style={{ height: '6px', background: '#EBECF0', borderRadius: '3px', overflow: 'hidden', marginBottom: '1.25rem' }}>
-                      <div style={{ width: `${progress}%`, height: '100%', background: progressColor, borderRadius: '3px', transition: 'width 0.6s ease' }} />
+                    <div className="progress-bar-wrap">
+                      <div className="progress-bar-fill" style={{ width: `${progress}%`, background: progressColor }} />
                     </div>
                   </div>
 
-                  {/* Action */}
                   <button
                     onClick={() => navigate('/tl/modules', { state: { projectId: proj._id } })}
-                    className="btn btn-primary"
-                    style={{ width: '100%', justifyContent: 'center' }}
+                    className="btn btn-primary w-full"
+                    style={{ justifyContent: 'center' }}
                   >
                     Manage Modules <ChevronRight size={15} />
                   </button>
@@ -109,12 +85,7 @@ const TLProjects = () => {
           })}
         </div>
       )}
-
-      <style>{`
-        .project-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(9,30,66,0.1) !important; border-color: #B3D4FF !important; }
-      `}</style>
     </div>
   );
 };
-
 export default TLProjects;

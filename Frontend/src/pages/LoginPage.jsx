@@ -92,7 +92,7 @@ const LoginPage = () => {
             </div>
             <h1>AXIS</h1>
           </div>
-          
+
           <div className="login-instructions animate-fade" key={role}>
             <h3>{rc.label} Portal</h3>
             <div className="instruction-list">
