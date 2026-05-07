@@ -7,9 +7,9 @@ const roleConfigs = {
   admin: {
     icon: <Shield size={22} />,
     label: 'Administrator',
-    color: '#0052CC',
-    bg: '#DEEBFF',
-    gradient: 'linear-gradient(135deg, #0052CC 0%, #2684FF 100%)',
+    color: '#007BFF',
+    bg: '#E6F3FF',
+    gradient: 'linear-gradient(135deg, #007BFF 0%, #4DA3FF 100%)',
     instructions: [
       'Manage platform users and permissions',
       'Oversee global project performance',
@@ -19,9 +19,9 @@ const roleConfigs = {
   teamleader: {
     icon: <Users size={22} />,
     label: 'Team Leader',
-    color: '#36B37E',
-    bg: '#E3FCEF',
-    gradient: 'linear-gradient(135deg, #36B37E 0%, #00B8D4 100%)',
+    color: '#0056CC',
+    bg: '#CCE5FF',
+    gradient: 'linear-gradient(135deg, #0056CC 0%, #007BFF 100%)',
     instructions: [
       'Orchestrate project roadmaps',
       'Review and verify submissions',
@@ -31,9 +31,9 @@ const roleConfigs = {
   developer: {
     icon: <User size={22} />,
     label: 'Developer',
-    color: '#6554C0',
-    bg: '#EAE6FF',
-    gradient: 'linear-gradient(135deg, #6554C0 0%, #FF7452 100%)',
+    color: '#004499',
+    bg: '#B3D9FF',
+    gradient: 'linear-gradient(135deg, #004499 0%, #0056CC 100%)',
     instructions: [
       'Execute high-impact modules',
       'Submit work for rapid review',
@@ -438,6 +438,62 @@ const LoginPage = () => {
           }
           .login-form-side {
             padding: 3rem;
+          }
+          .role-selector {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .login-wrapper {
+            padding: 1rem;
+          }
+          .login-container {
+            max-width: 100%;
+            border-radius: var(--radius-lg);
+          }
+          .login-branding {
+            padding: 2rem;
+          }
+          .login-form-side {
+            padding: 2rem;
+          }
+          .login-header h2 {
+            font-size: 1.75rem;
+          }
+          .login-instructions h3 {
+            font-size: 1.5rem;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .login-back {
+            top: 1rem;
+            left: 1rem;
+          }
+          .login-blob {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            right: -100px;
+          }
+          .login-branding {
+            padding: 1.5rem;
+          }
+          .login-form-side {
+            padding: 1.5rem;
+          }
+          .login-header h2 {
+            font-size: 1.5rem;
+          }
+          .login-instructions h3 {
+            font-size: 1.25rem;
+          }
+          .instruction-list {
+            gap: 1rem;
+          }
+          .instruction-item {
+            font-size: 0.95rem;
           }
         }
       `}</style>
