@@ -95,16 +95,19 @@ const createDeveloper = async (req, res) => {
     }
 };
 
-// @desc    Delete user (Soft delete)
+// @desc    Delete user (Hard delete)
 // @route   DELETE /api/users/:id
 // @access  Admin
 const deleteUser = async (req, res) => {
     try {
-        const user = await User.findById(req.params.id);
+        const user = await User.findByIdAndDelete(req.params.id);
         if (!user) return res.status(404).json({ success: false, error: 'User not found.' });
-        user.isActive = false;
-        await user.save();
-        res.json({ success: true, message: 'User deactivated successfully.' });
+        
+        // Optional: If you want to clean up assignments
+        // await Project.updateMany({ assignedTL: req.params.id }, { $set: { assignedTL: null } });
+        // await Module.updateMany({ assignedDev: req.params.id }, { $set: { assignedDev: null } });
+
+        res.json({ success: true, message: 'User permanently deleted from database.' });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

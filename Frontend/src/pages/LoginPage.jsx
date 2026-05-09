@@ -224,6 +224,11 @@ const LoginPage = () => {
           top: 2rem;
           left: 2rem;
           z-index: 10;
+          transition: all 0.3s ease;
+        }
+
+        .login-back:hover {
+          transform: translateX(-4px);
         }
 
         .login-container {
@@ -466,10 +471,14 @@ const LoginPage = () => {
             align-items: flex-start;
           }
           .login-back {
-            top: 0.75rem;
-            left: 0.75rem;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.8rem;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.8125rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white !important;
           }
           .login-container {
             max-width: 100%;
@@ -478,7 +487,7 @@ const LoginPage = () => {
             min-height: 100vh;
           }
           .login-branding {
-            padding: 3rem 1.5rem 1.5rem;
+            padding: 6rem 1.5rem 3rem;
             border-radius: 0;
           }
           .login-logo-container {
@@ -523,7 +532,7 @@ const LoginPage = () => {
             right: -80px;
           }
           .login-branding {
-            padding: 2.5rem 1.25rem 1.25rem;
+            padding: 6rem 2rem 2rem;
           }
           .login-form-side {
             padding: 1.5rem 1.25rem 1.5rem;
