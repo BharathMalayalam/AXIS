@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import {
   Briefcase, CheckCircle2, Clock,
   Plus, Activity,
   ChevronRight, MoreHorizontal, ArrowUpRight, ArrowDownRight,
-  Filter, Download
+  Filter, Download, Users, UserCheck, Layers, ShieldCheck,
+  TrendingUp, Zap, Calendar, ExternalLink
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const AdminDashboard = () => {
   const { projects, users, getAdminStats } = useApp();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalProjects: 0, activeProjects: 0, completedProjects: 0,
     pendingApproval: 0, totalTLs: 0, totalDevs: 0
@@ -37,12 +40,22 @@ const AdminDashboard = () => {
 
   const safeProjects = Array.isArray(projects) ? projects : [];
   const safeUsers    = Array.isArray(users) ? users : [];
+  const teamLeaders  = safeUsers.filter(u => u.role === 'teamleader');
+  const developers   = safeUsers.filter(u => u.role === 'developer');
 
   const statCards = [
-    { label: 'Total Projects', value: stats.totalProjects || 0,   trend: '+12%', trendUp: true, icon: <Briefcase size={22} />,    color: 'var(--primary)', bg: 'var(--primary-xlight)' },
-    { label: 'Active Modules', value: stats.activeProjects || 0,  trend: '+5%',  trendUp: true, icon: <Activity size={22} />,     color: 'var(--accent)', bg: 'var(--accent-light)' },
-    { label: 'Completed',      value: stats.completedProjects || 0, trend: '+18%', trendUp: true, icon: <CheckCircle2 size={22} />,color: 'var(--success)', bg: 'var(--success-bg)' },
-    { label: 'Pending Review', value: stats.pendingApproval || 0, trend: '-2%',   trendUp: false, icon: <Clock size={22} />,      color: 'var(--warning)', bg: 'var(--warning-bg)' },
+    { label: 'Total Projects', value: stats.totalProjects || 0,   trend: '+12%', trendUp: true, icon: <Briefcase size={20} />,    color: 'var(--primary)', bg: 'var(--primary-xlight)', link: '/admin/projects' },
+    { label: 'Active Modules', value: stats.activeProjects || 0,  trend: '+5%',  trendUp: true, icon: <Activity size={20} />,     color: 'var(--accent)', bg: 'var(--accent-light)', link: '/admin/projects' },
+    { label: 'Completed',      value: stats.completedProjects || 0, trend: '+18%', trendUp: true, icon: <CheckCircle2 size={20} />,color: 'var(--success)', bg: 'var(--success-bg)', link: '/admin/approval' },
+    { label: 'Pending Review', value: stats.pendingApproval || 0, trend: '-2%',   trendUp: false, icon: <Clock size={20} />,      color: 'var(--warning)', bg: 'var(--warning-bg)', link: '/admin/approval' },
+  ];
+
+  // Quick action cards for the overview
+  const quickActions = [
+    { label: 'Create Project', icon: <Plus size={18} />, action: () => navigate('/admin/projects'), color: 'var(--primary)', bg: 'var(--primary-xlight)' },
+    { label: 'Manage Leads', icon: <UserCheck size={18} />, action: () => navigate('/admin/team-leaders'), color: 'var(--success)', bg: 'var(--success-bg)' },
+    { label: 'Manage Devs', icon: <Users size={18} />, action: () => navigate('/admin/team-members'), color: 'var(--accent)', bg: 'var(--accent-light)' },
+    { label: 'Approvals', icon: <ShieldCheck size={18} />, action: () => navigate('/admin/approval'), color: 'var(--warning)', bg: 'var(--warning-bg)' },
   ];
 
   return (
@@ -56,15 +69,21 @@ const AdminDashboard = () => {
           <button className="btn btn-ghost btn-pill">
             <Download size={16} /> Export Report
           </button>
-          <button className="btn btn-primary btn-pill">
+          <button className="btn btn-primary btn-pill" onClick={() => navigate('/admin/projects')}>
             <Plus size={16} /> New Project
           </button>
         </div>
       </div>
 
+      {/* Stat Cards */}
       <div className="stat-grid mb-4">
         {statCards.map((card, i) => (
-          <div key={i} className="stat-card stagger-1" style={{ animationDelay: `${i * 0.1}s` }}>
+          <div
+            key={i}
+            className="stat-card stat-card-clickable stagger-1"
+            style={{ animationDelay: `${i * 0.1}s`, cursor: 'pointer' }}
+            onClick={() => navigate(card.link)}
+          >
             <div className="flex justify-between w-full items-center mb-2">
               <div className="stat-icon" style={{ background: card.bg, color: card.color }}>
                 {card.icon}
@@ -82,6 +101,24 @@ const AdminDashboard = () => {
         ))}
       </div>
 
+      {/* Quick Actions */}
+      <div className="quick-actions-grid mb-4">
+        {quickActions.map((action, i) => (
+          <button
+            key={i}
+            className="quick-action-card"
+            onClick={action.action}
+          >
+            <div className="quick-action-icon" style={{ background: action.bg, color: action.color }}>
+              {action.icon}
+            </div>
+            <span className="quick-action-label">{action.label}</span>
+            <ChevronRight size={14} className="quick-action-arrow" />
+          </button>
+        ))}
+      </div>
+
+      {/* Chart + Fleet Status */}
       <div className="dashboard-grid grid-2-1 mb-4">
         <div className="glass-card chart-container">
           <div className="card-header">
@@ -137,9 +174,9 @@ const AdminDashboard = () => {
           </div>
           <div className="flex flex-col gap-4">
             {[
-              { label: 'Cloud Resources', value: '42%', progress: 42, color: 'var(--primary)' },
-              { label: 'Active Developers', value: '88%', progress: 88, color: 'var(--success)' },
-              { label: 'Storage Used', value: '15%', progress: 15, color: 'var(--warning)' },
+              { label: 'Team Leaders', value: `${teamLeaders.length}`, progress: Math.min(teamLeaders.length * 20, 100), color: 'var(--primary)' },
+              { label: 'Active Developers', value: `${developers.length}`, progress: Math.min(developers.length * 10, 100), color: 'var(--success)' },
+              { label: 'Project Completion', value: `${stats.totalProjects > 0 ? Math.round(((stats.completedProjects || 0) / stats.totalProjects) * 100) : 0}%`, progress: stats.totalProjects > 0 ? Math.round(((stats.completedProjects || 0) / stats.totalProjects) * 100) : 0, color: 'var(--warning)' },
             ].map((item, i) => (
               <div key={i}>
                 <div className="flex justify-between items-center mb-1">
@@ -162,13 +199,16 @@ const AdminDashboard = () => {
         </div>
       </div>
 
+      {/* Active Project Pipeline */}
       <div className="table-container">
         <div className="card-header">
           <div className="card-header-title">
             <h3>Active Project Pipeline</h3>
             <p>Real-time status of all ongoing initiatives</p>
           </div>
-          <button className="btn btn-ghost btn-sm">View Pipeline <ChevronRight size={16} /></button>
+          <button className="btn btn-ghost btn-sm" onClick={() => navigate('/admin/projects')}>
+            View All <ChevronRight size={16} />
+          </button>
         </div>
         <table className="data-table">
           <thead>
@@ -188,6 +228,9 @@ const AdminDashboard = () => {
                     <div className="empty-state-icon"><Briefcase size={28} /></div>
                     <p className="empty-state-title">No projects found</p>
                     <p className="empty-state-text">Start by creating a new project to track progress.</p>
+                    <button className="btn btn-primary btn-pill mt-4" onClick={() => navigate('/admin/projects')}>
+                      <Plus size={16} /> Create First Project
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -217,12 +260,12 @@ const AdminDashboard = () => {
                   </td>
                   <td>
                     <div className="flex items-center gap-1 text-sm text-muted">
-                      <Clock size={13} />
+                      <Calendar size={13} />
                       {proj.createdAt ? new Date(proj.createdAt).toLocaleDateString() : 'No date'}
                     </div>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <button className="btn-icon-sm"><MoreHorizontal size={16} /></button>
+                    <button className="btn-icon-sm" onClick={() => navigate('/admin/projects')}><ExternalLink size={16} /></button>
                   </td>
                 </tr>
               ))

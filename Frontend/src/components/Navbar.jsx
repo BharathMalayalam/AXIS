@@ -3,22 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import {
   Bell, Search, ChevronDown, Settings, HelpCircle,
-  User, LogOut, ExternalLink, X, Plus
+  User, LogOut, ExternalLink, X, Plus,
+  Briefcase, UserCheck, Users, Layers, MessageSquare
 } from 'lucide-react';
 
 const Navbar = () => {
   const { currentUser, logout, sidebarCollapsed } = useApp();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
   const profileRef = useRef(null);
   const notifRef = useRef(null);
+  const createRef = useRef(null);
 
   useEffect(() => {
     const handler = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) setShowProfileMenu(false);
       if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotifications(false);
+      if (createRef.current && !createRef.current.contains(e.target)) setShowCreateMenu(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -27,9 +31,9 @@ const Navbar = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   const roleLabel = {
-    admin: 'Platform Admin',
+    admin: 'Admin',
     teamleader: 'Team Lead',
-    developer: 'Senior Developer',
+    developer: 'Developer',
   }[currentUser?.role] || currentUser?.role;
 
   const avatarColors = {
@@ -39,12 +43,58 @@ const Navbar = () => {
   };
   const avBg = avatarColors[currentUser?.role] || 'var(--primary)';
 
+  // Create menu options based on role
+  const getCreateOptions = () => {
+    const role = currentUser?.role;
+    if (role === 'admin') return [
+      { label: 'New Project', icon: <Briefcase size={15} />, path: '/admin/projects', desc: 'Create a new project' },
+      { label: 'Add Team Lead', icon: <UserCheck size={15} />, path: '/admin/team-leaders', desc: 'Onboard a team leader' },
+      { label: 'Add Developer', icon: <Users size={15} />, path: '/admin/team-members', desc: 'Onboard a developer' },
+    ];
+    if (role === 'teamleader') return [
+      { label: 'New Module', icon: <Layers size={15} />, path: '/tl/modules', desc: 'Add module to project' },
+      { label: 'Send Message', icon: <MessageSquare size={15} />, path: '/tl/queries', desc: 'Message your team' },
+    ];
+    return [
+      { label: 'Submit Module', icon: <Layers size={15} />, path: '/dev/modules', desc: 'Submit your work' },
+      { label: 'Ask Question', icon: <MessageSquare size={15} />, path: '/dev/queries', desc: 'Post a query' },
+    ];
+  };
+
   return (
     <header className={`navbar glass ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
       <div className="navbar-left">
-        <button className="btn btn-primary btn-pill btn-sm">
-          <Plus size={16} /> Create
-        </button>
+        <div className="navbar-create-wrapper" ref={createRef}>
+          <button
+            className="btn btn-primary btn-pill btn-sm"
+            onClick={() => { setShowCreateMenu(!showCreateMenu); setShowProfileMenu(false); setShowNotifications(false); }}
+          >
+            <Plus size={16} /> Create
+          </button>
+          {showCreateMenu && (
+            <div className="dropdown-menu create-dropdown animate-up">
+              <div className="dropdown-header">
+                <h4>Quick Create</h4>
+                <button className="modal-close" onClick={() => setShowCreateMenu(false)}><X size={16} /></button>
+              </div>
+              <div className="dropdown-body">
+                {getCreateOptions().map((opt, i) => (
+                  <button
+                    key={i}
+                    className="create-option"
+                    onClick={() => { navigate(opt.path); setShowCreateMenu(false); }}
+                  >
+                    <div className="create-option-icon">{opt.icon}</div>
+                    <div className="create-option-content">
+                      <span className="create-option-label">{opt.label}</span>
+                      <span className="create-option-desc">{opt.desc}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         <div className="navbar-divider"></div>
         <div className="navbar-search-box">
           <Search size={16} className="search-icon" />
@@ -64,7 +114,7 @@ const Navbar = () => {
 
           <div className="navbar-notif-wrapper" ref={notifRef}>
             <button
-              onClick={() => { setShowNotifications(!showNotifications); setShowProfileMenu(false); }}
+              onClick={() => { setShowNotifications(!showNotifications); setShowProfileMenu(false); setShowCreateMenu(false); }}
               className={`nav-tool-btn ${showNotifications ? 'active' : ''}`}
             >
               <Bell size={18} />
@@ -88,7 +138,7 @@ const Navbar = () => {
 
         <div className="navbar-profile-wrapper" ref={profileRef}>
           <button
-            onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); }}
+            onClick={() => { setShowProfileMenu(!showProfileMenu); setShowNotifications(false); setShowCreateMenu(false); }}
             className={`profile-trigger ${showProfileMenu ? 'active' : ''}`}
           >
             <div className="avatar avatar-xs" style={{ background: avBg }}>
