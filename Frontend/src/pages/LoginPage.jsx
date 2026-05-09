@@ -156,7 +156,12 @@ const LoginPage = () => {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Secret Key</label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <label className="form-label">Secret Key</label>
+                <Link to="/forgot-password" style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--primary)', textDecoration: 'none', marginBottom: '0.5rem' }}>
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="input-with-icon">
                 <Lock size={18} className="input-icon" />
                 <input
@@ -428,72 +433,106 @@ const LoginPage = () => {
           .login-container {
             flex-direction: column;
             height: auto;
-            max-width: 500px;
+            max-width: 480px;
           }
           .login-branding {
-            padding: 3rem;
+            padding: 2.5rem 2rem;
           }
           .login-logo-container {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
           }
+          .login-instructions h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.25rem;
+          }
+          .instruction-list { gap: 0.875rem; }
+          .instruction-item { font-size: 0.9375rem; }
+          .login-branding-footer { margin-top: 1.5rem; }
           .login-form-side {
-            padding: 3rem;
+            padding: 2.5rem 2rem;
           }
+          .login-header h2 { font-size: 1.75rem; }
+          .login-header p { margin-bottom: 2rem; }
           .role-selector {
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(3, 1fr);
+            margin-bottom: 1.75rem;
           }
+          .role-tab { padding: 0.75rem 0.375rem; }
         }
 
         @media (max-width: 640px) {
           .login-wrapper {
-            padding: 1rem;
+            padding: 0;
+            align-items: flex-start;
+          }
+          .login-back {
+            top: 0.75rem;
+            left: 0.75rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8rem;
           }
           .login-container {
             max-width: 100%;
-            border-radius: var(--radius-lg);
+            border-radius: 0;
+            box-shadow: none;
+            min-height: 100vh;
           }
           .login-branding {
-            padding: 2rem;
+            padding: 3rem 1.5rem 1.5rem;
+            border-radius: 0;
           }
+          .login-logo-container {
+            margin-bottom: 1.25rem;
+          }
+          .login-logo-container h1 { font-size: 1.75rem; }
+          .login-logo-icon { width: 42px; height: 42px; border-radius: 12px; }
+          .login-logo-icon img { width: 26px; }
+          .login-instructions h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+          }
+          .instruction-list { gap: 0.75rem; }
+          .instruction-item { font-size: 0.875rem; gap: 0.75rem; }
+          .login-branding-footer { font-size: 0.75rem; margin-top: 1.25rem; }
           .login-form-side {
-            padding: 2rem;
+            padding: 1.75rem 1.5rem 2rem;
           }
           .login-header h2 {
-            font-size: 1.75rem;
-          }
-          .login-instructions h3 {
             font-size: 1.5rem;
+            margin-bottom: 0.375rem;
           }
+          .login-header p { font-size: 0.875rem; margin-bottom: 1.5rem; }
+          .role-selector {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+          }
+          .role-tab { padding: 0.625rem 0.25rem; gap: 0.375rem; }
+          .role-icon { transform: scale(0.9); }
+          .role-name { font-size: 0.625rem; }
+          .login-form { gap: 1.125rem; }
+          .login-error { padding: 0.75rem; margin-bottom: 1.25rem; font-size: 0.8125rem; }
+          .form-label { font-size: 0.75rem; }
         }
 
         @media (max-width: 480px) {
-          .login-back {
-            top: 1rem;
-            left: 1rem;
-          }
           .login-blob {
-            width: 400px;
-            height: 400px;
-            top: -100px;
-            right: -100px;
+            width: 300px;
+            height: 300px;
+            top: -80px;
+            right: -80px;
           }
           .login-branding {
-            padding: 1.5rem;
+            padding: 2.5rem 1.25rem 1.25rem;
           }
           .login-form-side {
-            padding: 1.5rem;
+            padding: 1.5rem 1.25rem 1.5rem;
           }
           .login-header h2 {
-            font-size: 1.5rem;
-          }
-          .login-instructions h3 {
-            font-size: 1.25rem;
-          }
-          .instruction-list {
-            gap: 1rem;
+            font-size: 1.375rem;
           }
           .instruction-item {
-            font-size: 0.95rem;
+            font-size: 0.8125rem;
           }
         }
       `}</style>

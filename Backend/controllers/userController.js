@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { sendWelcomeEmail } = require('../utils/sendEmail');
 
 // @desc    Get all active users (optionally filter by role)
 // @route   GET /api/users?role=developer
@@ -38,7 +39,21 @@ const createTeamLeader = async (req, res) => {
         if (exists) return res.status(400).json({ success: false, error: 'Email or User ID already exists.' });
 
         const tl = await User.create({ name, email, phone, userId: userId.toUpperCase(), password, role: 'teamleader' });
-        res.status(201).json({ success: true, user: tl });
+
+        // Send welcome email with credentials (non-blocking)
+        sendWelcomeEmail({
+            email,
+            name,
+            userId: userId.toUpperCase(),
+            password, // plain text (before hashing)
+            role: 'teamleader',
+        }).then(() => {
+            console.log(`✅ Welcome email sent to ${email}`);
+        }).catch((err) => {
+            console.error(`❌ Failed to send welcome email to ${email}:`, err.message);
+        });
+
+        res.status(201).json({ success: true, user: tl, emailSent: true });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
@@ -60,7 +75,21 @@ const createDeveloper = async (req, res) => {
         if (exists) return res.status(400).json({ success: false, error: 'Email or User ID already exists.' });
 
         const dev = await User.create({ name, email, phone, userId: userId.toUpperCase(), password, role: 'developer', teamLeaderId });
-        res.status(201).json({ success: true, user: dev });
+
+        // Send welcome email with credentials (non-blocking)
+        sendWelcomeEmail({
+            email,
+            name,
+            userId: userId.toUpperCase(),
+            password, // plain text (before hashing)
+            role: 'developer',
+        }).then(() => {
+            console.log(`✅ Welcome email sent to ${email}`);
+        }).catch((err) => {
+            console.error(`❌ Failed to send welcome email to ${email}:`, err.message);
+        });
+
+        res.status(201).json({ success: true, user: dev, emailSent: true });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }

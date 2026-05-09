@@ -3,6 +3,8 @@ import { useApp } from './context/AppContext';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageProjects from './pages/admin/ManageProjects';
@@ -55,6 +57,8 @@ export default function App() {
         {/* Public */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={currentUser ? <Navigate to={defaultPath} /> : <LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
         {/* Admin */}
         <Route path="/admin" element={<ProtectedLayout allowedRoles={['admin']}><AdminDashboard /></ProtectedLayout>} />
