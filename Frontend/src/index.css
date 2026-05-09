@@ -531,18 +531,18 @@ a  { text-decoration:none; color:inherit; transition:var(--transition-fast); }
 .sidebar-mobile-toggle {
   display: none;
   position: fixed;
-  top: 1rem;
-  left: 1rem;
-  z-index: 1000;
+  top: 0.5rem; /* Adjusted to center in 56px navbar */
+  left: 0.75rem;
+  z-index: 1005; /* Must be higher than navbar (1001) */
   background: var(--bg-card);
   border: 1px solid var(--border);
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-sm);
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   color: var(--text-primary);
   transition: var(--transition-fast);
 }
@@ -1280,6 +1280,7 @@ a  { text-decoration:none; color:inherit; transition:var(--transition-fast); }
     gap: 0.5rem;
     flex: 1;
     min-width: 0;
+    padding-left: 3.25rem; /* Make room for the floating toggle button */
   }
 
   .navbar-divider { display: none; }
@@ -1479,7 +1480,10 @@ a  { text-decoration:none; color:inherit; transition:var(--transition-fast); }
 
   /* --- Sidebar Mobile Drawer --- */
   .sidebar-overlay {
-    z-index: 9999;
+    z-index: 10000; /* Highest priority */
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
   }
   .sidebar-mobile-drawer {
     width: 280px;
